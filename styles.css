@@ -89,7 +89,7 @@ input[type="submit"] {
 
 .container {
     width: 100%;
-    max-width: 1200px;
+    max-width: 800px; /*anterior 1200px*/
     margin: 0 auto;
     padding: 0 15px;
 }
@@ -98,8 +98,8 @@ input[type="submit"] {
     width: 100%;
     padding: 10px;
     max-width: 400px;
-    margin-left: auto;
-    margin-right: auto;
+    /* margin-left: auto;
+    margin-right: auto;*/
 
 }
 
