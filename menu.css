@@ -18,6 +18,8 @@
     display: none;
     flex-direction: column;
     cursor: pointer;
+    margin-right: 20px; /* Añadir margen a la derecha */
+
 }
 .menu-toggle div {
     width: 25px;
