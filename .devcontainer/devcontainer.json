@@ -8,12 +8,15 @@
                 "esbenp.prettier-vscode",
                 "formulahendry.auto-rename-tag",
                 "formulahendry.auto-close-tag",
-                "sidthesloth.html5-boilerplate"
-            ]
+                "sidthesloth.html5-boilerplate",
+                "ms-vscode.live-server"
+            ],
+            "settings": {
+                "editor.formatOnSave": true
+            }
         }
     },
     "postCreateCommand": "npm install",
-    "settings": {
-        "editor.formatOnSave": true
-    }
+    "overrideCommand": false
 }
+
