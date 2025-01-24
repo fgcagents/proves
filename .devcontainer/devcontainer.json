@@ -1,0 +1,19 @@
+{
+    "name": "HTML, JavaScript, and CSS Environment",
+    "image": "mcr.microsoft.com/devcontainers/javascript-node:0-18",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "dbaeumer.vscode-eslint",
+                "esbenp.prettier-vscode",
+                "formulahendry.auto-rename-tag",
+                "formulahendry.auto-close-tag",
+                "sidthesloth.html5-boilerplate"
+            ]
+        }
+    },
+    "postCreateCommand": "npm install",
+    "settings": {
+        "editor.formatOnSave": true
+    }
+}
