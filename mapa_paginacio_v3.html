@@ -16,15 +16,9 @@
             attribution: '© OpenStreetMap contributors'
         }).addTo(map);
 
-        // Añadir después de la inicialización del mapa
-        let marcadores = [];
+        let marcadores = {};
 
-        // Modificar la función obtenerDatos
         async function obtenerDatos() {
-            // Eliminar marcadores existentes
-            marcadores.forEach(marcador => map.removeLayer(marcador));
-            marcadores = [];
-            
             const limitePorPagina = 20;
             let start = 0;
             let tieneMasDatos = true;
@@ -45,7 +39,8 @@
                             const linia = tren.lin;
                             const puntual = tren.en_hora;
                             const desti = tren.desti;
-                            
+                            const id = tren.id; // Asumiendo que cada tren tiene un ID único
+
                             const propera_parada = (() => {
                                 try {
                                     if (!tren.properes_parades) return "N/A";
@@ -56,12 +51,17 @@
                                 }
                             })();
 
-                            // Crear y almacenar el nuevo marcador
-                            const marcador = L.marker([lat, lon])
-                                .addTo(map)
-                                .bindPopup(`<b>Unitat: </b>${unitat}<br><b>Línea: </b>${linia}<br><b>Puntual: </b>${puntual}<br><b>Destí: </b>${desti}<br><b>Propera: </b>${propera_parada}<br>`);
-                            
-                            marcadores.push(marcador);
+                            if (marcadores[id]) {
+                                // Actualizar la posición del marcador existente
+                                marcadores[id].setLatLng([lat, lon]);
+                                marcadores[id].setPopupContent(`<b>Unitat: </b>${unitat}<br><b>Línea: </b>${linia}<br><b>Puntual: </b>${puntual}<br><b>Destí: </b>${desti}<br><b>Propera: </b>${propera_parada}<br>`);
+                            } else {
+                                // Crear un nuevo marcador
+                                const marcador = L.marker([lat, lon])
+                                    .addTo(map)
+                                    .bindPopup(`<b>Unitat: </b>${unitat}<br><b>Línea: </b>${linia}<br><b>Puntual: </b>${puntual}<br><b>Destí: </b>${desti}<br><b>Propera: </b>${propera_parada}<br>`);
+                                marcadores[id] = marcador;
+                            }
                         });
                         start += limitePorPagina;
                     }
@@ -73,7 +73,7 @@
         }
 
         // Actualizar la página cada 15 segundos
-       setInterval(() => {
+        setInterval(() => {
             obtenerDatos();
         }, 15000);
 
