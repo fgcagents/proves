@@ -239,7 +239,7 @@ function updateTable() {
         if (!loadMoreButton) {
             const button = document.createElement('button');
             button.id = 'loadMoreButton';
-            button.textContent = 'Carregar més';
+            button.textContent = '+ més';
             button.className = 'clear-filters';
             button.style.marginTop = '1rem';
             button.addEventListener('click', () => {
