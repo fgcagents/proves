@@ -149,6 +149,15 @@ function filterData() {
         horaInici: elements.horaInici.value,
         horaFi: elements.horaFi.value
     };
+
+    // Verificar si hay algún filtro activo
+    const hasActiveFilters = Object.values(filters).some(value => value !== '' && value !== undefined);
+    
+    // Si no hay filtros activos, ocultar la tabla y salir
+    if (!hasActiveFilters) {
+        elements.resultContainer.style.display = 'none';
+        return;
+    }
     
     const horaIniciMinuts = timeToMinutes(filters.horaInici);
     const horaFiMinuts = timeToMinutes(filters.horaFi);
@@ -249,7 +258,8 @@ elements.clearFilters.addEventListener('click', clearFilters);
 window.onload = async () => {
     try {
         await Promise.all([cargarEstaciones(), loadData()]);
-        filterData(); // Inicializar la tabla con todos los datos
+        // No llamamos a filterData() aquí para que la tabla empiece vacía
+        elements.resultContainer.style.display = 'none';
     } catch (error) {
         console.error('Error durante la inicialización:', error);
         showError('Error al inicializar la aplicación');
