@@ -260,7 +260,7 @@ function updateTable() {
                 <td>${entry.hora}</td>
                 <td>${entry.linia}</td>
             </tr>
-        ;
+        `;
         fragment.appendChild(row);
     });
 
