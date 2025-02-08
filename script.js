@@ -82,7 +82,10 @@ async function loadData() {
         
         if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
         
-        data = await response.json();
+        const jsonData = await response.json();
+        data = jsonData; // Guardar los datos pero no mostrarlos
+        elements.resultContainer.style.display = 'none'; // Asegurar que la tabla está oculta
+        filteredData = []; // Inicializar el array de datos filtrados vacío
         return data;
         
     } catch (error) {
@@ -150,7 +153,14 @@ function filterData() {
         horaFi: elements.horaFi.value.trim()
     };
 
-    const hasActiveFilters = Object.values(filters).some(value => value !== '');
+    // Debug para ver el estado de los filtros
+    console.log('Estado de los filtros:', filters);
+
+    // Comprobar si hay algún filtro activo (ignorando espacios en blanco)
+    const hasActiveFilters = Object.values(filters).some(value => value !== '' && value !== undefined && value !== null);
+    
+    // Debug para ver si hay filtros activos
+    console.log('¿Hay filtros activos?:', hasActiveFilters);
     
     if (!hasActiveFilters) {
         elements.resultContainer.style.display = 'none';
@@ -257,8 +267,20 @@ elements.clearFilters.addEventListener('click', clearFilters);
 // Inicialització
 window.onload = async () => {
     try {
-        await Promise.all([cargarEstaciones(), loadData()]);
+        // Ocultar la tabla antes de cargar los datos
         elements.resultContainer.style.display = 'none';
+        
+        // Inicializar los datos filtrados como array vacío
+        filteredData = [];
+        
+        // Cargar los datos
+        await Promise.all([cargarEstaciones(), loadData()]);
+        
+        // No llamar a filterData() aquí
+        // Asegurarse de que la tabla permanece oculta
+        elements.resultContainer.style.display = 'none';
+        
+        console.log('Inicialización completada - La tabla debería estar oculta');
     } catch (error) {
         console.error('Error durante la inicialización:', error);
         showError('Error al inicializar la aplicación');
