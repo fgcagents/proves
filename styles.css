@@ -197,11 +197,10 @@ tr:nth-child(even) {
     color: white;
     border: none;
     border-radius: 5px;
-    padding: 0.5rem 0.5rem;
+    padding: 0.5rem 1rem;
     cursor: pointer;
     transition: background-color 0.3s ease;
     margin-top: 1rem;
-    width: 80px;
     letter-spacing: 0.05rem;
 }
 

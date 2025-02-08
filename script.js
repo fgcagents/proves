@@ -119,8 +119,6 @@ function clearFilters() {
     elements.horaInici.value = '';
     elements.horaFi.value = '';
     elements.resultContainer.style.display = 'none';
-    filteredData = []; // Limpiar los datos filtrados
-    updateTable(); // Actualizar la tabla (estará vacía)
 }
 
 function sortResultsByTime(results) {
@@ -128,9 +126,11 @@ function sortResultsByTime(results) {
         const timeA = timeToMinutes(a.hora);
         const timeB = timeToMinutes(b.hora);
 
+        // Manejar casos de tiempo nulo
         if (timeA === null) return 1;
         if (timeB === null) return -1;
 
+        // Ajustar para horarios después de medianoche
         const adjustedTimeA = timeA < 240 ? timeA + 1440 : timeA;
         const adjustedTimeB = timeB < 240 ? timeB + 1440 : timeB;
 
@@ -140,25 +140,15 @@ function sortResultsByTime(results) {
 
 // Funció principal de filtratge
 function filterData() {
-    // Verificar si hay algún filtro activo
-    const filters = {
-        tren: elements.tren.value.trim(),
-        linia: elements.linia.value.trim(),
-        ad: elements.ad.value.trim(),
-        estacio: elements.estacio.value.trim(),
-        horaInici: elements.horaInici.value.trim(),
-        horaFi: elements.horaFi.value.trim()
-    };
-
-    const hasActiveFilters = Object.values(filters).some(value => value !== '');
-    
-    if (!hasActiveFilters) {
-        elements.resultContainer.style.display = 'none';
-        filteredData = [];
-        return;
-    }
-
     currentPage = 0;
+    const filters = {
+        tren: elements.tren.value.toLowerCase(),
+        linia: elements.linia.value.toLowerCase(),
+        ad: elements.ad.value,
+        estacio: elements.estacio.value.toLowerCase(),
+        horaInici: elements.horaInici.value,
+        horaFi: elements.horaFi.value
+    };
     
     const horaIniciMinuts = timeToMinutes(filters.horaInici);
     const horaFiMinuts = timeToMinutes(filters.horaFi);
@@ -179,10 +169,10 @@ function filterData() {
                     (entryTimeMinutes >= horaIniciMinuts && entryTimeMinutes <= horaFiMinuts);
                 
                 return (
-                    (!filters.tren || entry.tren.toLowerCase().includes(filters.tren.toLowerCase())) &&
-                    (!filters.linia || entry.linia.toLowerCase().includes(filters.linia.toLowerCase())) &&
+                    (!filters.tren || entry.tren.toLowerCase().includes(filters.tren)) &&
+                    (!filters.linia || entry.linia.toLowerCase().includes(filters.linia)) &&
                     (!filters.ad || entry.ad === filters.ad) &&
-                    (!filters.estacio || entry.estacio.toLowerCase().includes(filters.estacio.toLowerCase())) &&
+                    (!filters.estacio || entry.estacio.toLowerCase().includes(filters.estacio)) &&
                     matchesTimeRange
                 );
             })
@@ -195,41 +185,42 @@ function filterData() {
 // Funció per actualitzar la taula
 function updateTable() {
     const tbody = elements.resultats.querySelector('tbody');
-    tbody.innerHTML = '';
-    
-    // Si no hay datos filtrados o no hay filtros activos, ocultar la tabla
-    if (!filteredData || filteredData.length === 0) {
-        elements.resultContainer.style.display = 'none';
-        return;
-    }
-
     const fragment = document.createDocumentFragment();
+
     const startIndex = currentPage * ITEMS_PER_PAGE;
     const endIndex = startIndex + ITEMS_PER_PAGE;
     const itemsToShow = filteredData.slice(startIndex, endIndex);
 
-    itemsToShow.forEach(entry => {
+    tbody.innerHTML = '';
+
+    if (itemsToShow.length === 0 && currentPage === 0) {
         const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${entry.ad}</td>
-            <td>${entry.tren}</td>
-            <td>${entry.estacio}</td>
-            <td>${entry.hora}</td>
-            <td>${entry.linia}</td>
-        `;
+        row.className = 'no-results';
+        row.innerHTML = '<td colspan="5">No s\'han trobat resultats</td>';
         fragment.appendChild(row);
-    });
+    } else {
+        itemsToShow.forEach(entry => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${entry.ad}</td>
+                <td>${entry.tren}</td>
+                <td>${entry.estacio}</td>
+                <td>${entry.hora}</td>
+                <td>${entry.linia}</td>
+            `;
+            fragment.appendChild(row);
+        });
+    }
 
     tbody.appendChild(fragment);
     elements.resultContainer.style.display = 'block';
 
-    // Gestionar el botón "Cargar más"
     const loadMoreButton = document.getElementById('loadMoreButton');
     if (filteredData.length > endIndex) {
         if (!loadMoreButton) {
             const button = document.createElement('button');
             button.id = 'loadMoreButton';
-            button.textContent = '+ més';
+            button.textContent = 'Carregar més';
             button.className = 'clear-filters';
             button.style.marginTop = '1rem';
             button.addEventListener('click', () => {
@@ -258,7 +249,7 @@ elements.clearFilters.addEventListener('click', clearFilters);
 window.onload = async () => {
     try {
         await Promise.all([cargarEstaciones(), loadData()]);
-        elements.resultContainer.style.display = 'none';
+        filterData(); // Inicializar la tabla con todos los datos
     } catch (error) {
         console.error('Error durante la inicialización:', error);
         showError('Error al inicializar la aplicación');
