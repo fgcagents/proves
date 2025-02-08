@@ -1,4 +1,4 @@
-// Variables globals
+/ Variables globals/
 let data = [];
 let currentPage = 0;
 const ITEMS_PER_PAGE = 33;
@@ -11,7 +11,8 @@ const elements = {
     tren: document.getElementById('tren'),
     linia: document.getElementById('linia'),
     ad: document.getElementById('ad'),
-    estacio: document.getElementById('estacio'),
+    estacioInici: document.getElementById('estacioInici'),
+    estacioFi: document.getElementById('estacioFi'),
     horaInici: document.getElementById('horaInici'),
     horaFi: document.getElementById('horaFi'),
     resultContainer: document.getElementById('resultContainer'),
@@ -39,6 +40,38 @@ async function cargarEstaciones() {
     }
 }
 
+// Función para obtener el orden de las estaciones
+function getStationOrder(data) {
+    // Tomamos el primer tren para obtener el orden de las estaciones
+    const firstTrain = data[0];
+    return Object.keys(firstTrain).filter(key => 
+        key !== 'Tren' && key !== 'Linia' && key !== 'A/D'
+    );
+}
+
+// Función para verificar si una estación está en el rango seleccionado
+function isStationInRange(station, startStation, endStation, stationOrder) {
+    const currentIndex = stationOrder.indexOf(station);
+    
+    // Si la estación actual no existe en el orden, retornar false
+    if (currentIndex === -1) return false;
+    
+    // Si no hay estación inicial ni final, mostrar todas
+    if (!startStation && !endStation) return true;
+    
+    const startIndex = startStation ? stationOrder.indexOf(startStation) : 0;
+    const endIndex = endStation ? stationOrder.indexOf(endStation) : stationOrder.length - 1;
+    
+    // Si la estación inicial especificada no existe, usar el inicio de la línea
+    if (startStation && startIndex === -1) return false;
+    
+    // Si la estación final especificada no existe, usar el final de la línea
+    if (endStation && endIndex === -1) return false;
+    
+    return currentIndex >= Math.min(startIndex, endIndex) && 
+           currentIndex <= Math.max(startIndex, endIndex);
+}
+
 // Funció per actualitzar el títol de la taula
 function updateTableTitle() {
     const select = document.getElementById('ad');
@@ -64,13 +97,13 @@ function timeToMinutes(timeStr) {
 function convertTimeToMinutes(timeStr) {
     if (!timeStr) return null;
     let [hours, minutes] = timeStr.split(':').map(Number);
-    
+
     if (timeStr.toLowerCase().includes('pm') && hours < 12) {
         hours += 12;
     } else if (timeStr.toLowerCase().includes('am') && hours === 12) {
         hours = 0;
     }
-    
+
     return hours * 60 + minutes;
 }
 
@@ -79,12 +112,12 @@ async function loadData() {
     try {
         elements.loading.classList.add('visible');
         const response = await fetch('itinerari_LA51_1_feiners_asc_desc.json');
-        
+
         if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
-        
+
         data = await response.json();
         return data;
-        
+
     } catch (error) {
         console.error('Error al cargar dades:', error);
         elements.loading.classList.remove('visible');
@@ -112,12 +145,14 @@ function debounce(func, delay) {
 }
 
 function clearFilters() {
-    elements.tren.value = '';
-    elements.linia.value = '';
-    elements.ad.value = '';
-    elements.estacio.value = '';
-    elements.horaInici.value = '';
-    elements.horaFi.value = '';
+        elements.tren.value = '';
+        elements.linia.value = '';
+        elements.ad.value = '';
+        elements.estacio.value = '';
+        elements.horaInici.value = '';
+        elements.horaFi.value = '';
+        elements.estacioInici.value = '';
+        elements.estacioFi.value = '';
     elements.resultContainer.style.display = 'none';
     filteredData = []; // Limpiar los datos filtrados
     updateTable(); // Actualizar la tabla (estará vacía)
@@ -140,14 +175,15 @@ function sortResultsByTime(results) {
 
 // Funció principal de filtratge
 function filterData() {
-    // Verificar si hay algún filtro activo
     const filters = {
         tren: elements.tren.value.trim(),
         linia: elements.linia.value.trim(),
         ad: elements.ad.value.trim(),
         estacio: elements.estacio.value.trim(),
         horaInici: elements.horaInici.value.trim(),
-        horaFi: elements.horaFi.value.trim()
+        horaFi: elements.horaFi.value.trim(),
+        estacioInici: elements.estacioInici.value.trim(),
+        estacioFi: elements.estacioFi.value.trim()
     };
 
     const hasActiveFilters = Object.values(filters).some(value => value !== '');
@@ -162,10 +198,19 @@ function filterData() {
     
     const horaIniciMinuts = timeToMinutes(filters.horaInici);
     const horaFiMinuts = timeToMinutes(filters.horaFi);
+    const stationOrder = getStationOrder(data);
     
-    filteredData = data.flatMap(item => 
-        Object.keys(item)
+    filteredData = data.flatMap(item => {
+        // Primero filtramos por tren, línea y dirección
+        if ((filters.tren && !item.Tren.toLowerCase().includes(filters.tren.toLowerCase())) ||
+            (filters.linia && !item.Linia.toLowerCase().includes(filters.linia.toLowerCase())) ||
+            (filters.ad && item['A/D'] !== filters.ad)) {
+            return [];
+        }
+
+        return Object.keys(item)
             .filter(key => key !== 'Tren' && key !== 'Linia' && key !== 'A/D' && item[key])
+            .filter(station => isStationInRange(station, filters.estacioInici, filters.estacioFi, stationOrder))
             .map(station => ({
                 tren: item.Tren,
                 linia: item.Linia,
@@ -179,14 +224,11 @@ function filterData() {
                     (entryTimeMinutes >= horaIniciMinuts && entryTimeMinutes <= horaFiMinuts);
                 
                 return (
-                    (!filters.tren || entry.tren.toLowerCase().includes(filters.tren.toLowerCase())) &&
-                    (!filters.linia || entry.linia.toLowerCase().includes(filters.linia.toLowerCase())) &&
-                    (!filters.ad || entry.ad === filters.ad) &&
                     (!filters.estacio || entry.estacio.toLowerCase().includes(filters.estacio.toLowerCase())) &&
                     matchesTimeRange
                 );
-            })
-    );
+            });
+    });
 
     filteredData = sortResultsByTime(filteredData);
     updateTable();
@@ -196,7 +238,7 @@ function filterData() {
 function updateTable() {
     const tbody = elements.resultats.querySelector('tbody');
     tbody.innerHTML = '';
-    
+
     // Si no hay datos filtrados o no hay filtros activos, ocultar la tabla
     if (!filteredData || filteredData.length === 0) {
         elements.resultContainer.style.display = 'none';
@@ -210,13 +252,15 @@ function updateTable() {
 
     itemsToShow.forEach(entry => {
         const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${entry.ad}</td>
-            <td>${entry.tren}</td>
-            <td>${entry.estacio}</td>
-            <td>${entry.hora}</td>
-            <td>${entry.linia}</td>
-        `;
+        row.innerHTML = 
+            <tr>
+                <td>${entry.ad}</td>
+                <td>${entry.tren}</td>
+                <td>${entry.estacio}</td>
+                <td>${entry.hora}</td>
+                <td>${entry.linia}</td>
+            </tr>
+        ;
         fragment.appendChild(row);
     });
 
@@ -229,7 +273,7 @@ function updateTable() {
         if (!loadMoreButton) {
             const button = document.createElement('button');
             button.id = 'loadMoreButton';
-            button.textContent = '+ més';
+            button.textContent = 'Carregar més';
             button.className = 'clear-filters';
             button.style.marginTop = '1rem';
             button.addEventListener('click', () => {
@@ -253,6 +297,8 @@ elements.estacio.addEventListener('input', debounce(filterData, DEBOUNCE_DELAY))
 elements.horaInici.addEventListener('input', debounce(filterData, DEBOUNCE_DELAY));
 elements.horaFi.addEventListener('input', debounce(filterData, DEBOUNCE_DELAY));
 elements.clearFilters.addEventListener('click', clearFilters);
+elements.estacioInici.addEventListener('input', debounce(filterData, DEBOUNCE_DELAY));
+elements.estacioFi.addEventListener('input', debounce(filterData, DEBOUNCE_DELAY));
 
 // Inicialització
 window.onload = async () => {
