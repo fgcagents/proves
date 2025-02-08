@@ -252,7 +252,7 @@ function updateTable() {
 
     itemsToShow.forEach(entry => {
         const row = document.createElement('tr');
-        row.innerHTML = 
+        row.innerHTML = ` 
             <tr>
                 <td>${entry.ad}</td>
                 <td>${entry.tren}</td>
