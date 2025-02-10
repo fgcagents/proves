@@ -98,6 +98,41 @@ async function loadData(filename = 'itinerari_LA51_1_0_1_asc_desc.json') {
     }
 }
 
+// Funció per inicialitzar els event listeners del menú
+function initMenuListeners() {
+    document.querySelectorAll('.menu a').forEach(link => {
+        link.addEventListener('click', async (e) => {
+            e.preventDefault(); // Prevenim la navegació per defecte
+            console.log('Click detectat'); // Per debugar
+            
+            const filename = e.target.dataset.file;
+            console.log('Fitxer a carregar:', filename); // Per debugar
+            
+            try {
+                await loadData(filename);
+                console.log('Dades carregades'); // Per debugar
+                
+                // Actualitzar el títol
+                const title = filename.includes('0_1') ? '000/100' : 
+                             filename.includes('4_5') ? '400/500' : 
+                             filename.includes('2_3') ? '200/300' : 
+                             'feiners';
+                             
+                document.querySelector('h1').textContent = `Itinerari LA51_1 ${title}`;
+                
+                // Si tens alguna funció que processa o mostra les dades, crida-la aquí
+                // Per exemple: processData() o showData()
+                
+            } catch (error) {
+                console.error('Error al canviar d\'itinerari:', error);
+            }
+        });
+    });
+}
+
+// Cridar la funció d'inicialització quan el document estigui llest
+document.addEventListener('DOMContentLoaded', initMenuListeners);
+
 // Funcions d'utilitat
 function showError(message) {
     elements.errorMessage.textContent = message;
@@ -264,24 +299,7 @@ elements.estacio.addEventListener('input', debounce(filterData, DEBOUNCE_DELAY))
 elements.horaInici.addEventListener('input', debounce(filterData, DEBOUNCE_DELAY));
 elements.horaFi.addEventListener('input', debounce(filterData, DEBOUNCE_DELAY));
 elements.clearFilters.addEventListener('click', clearFilters);
-document.querySelectorAll('.menu a').forEach(link => {
-    link.addEventListener('click', async (e) => {
-        e.preventDefault();
-        const filename = e.target.dataset.file;
-        try {
-            await loadData(filename);
-            // Actualitzar el títol si cal
-            document.querySelector('h1').textContent = `Itinerari LA51_1 ${
-                filename.includes('0_1') ? '000/100' : 
-                filename.includes('4_5') ? '400/500' : 
-                filename.includes('2_3') ? '200/300' : 
-                'feiners'}`;
-                
-        } catch (error) {
-            console.error('Error al canviar d\'itinerari:', error);
-        }
-    });
-});
+
 
 // Inicialització
 window.onload = async () => {
