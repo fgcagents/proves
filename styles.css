@@ -72,7 +72,7 @@ input:focus, select:focus {
     margin-top: 20px;
     margin-left:auto;
     margin-rigth:auto;
-    max-width: 400px;
+    width: 400px;
     display: none;
 }
 
