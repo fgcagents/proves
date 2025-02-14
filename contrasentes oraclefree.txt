@@ -1,0 +1,30 @@
+CloudPanel
+User Name
+oraclefree
+E-Mail
+pixartjeti3312@gmail.com
+1992Cloud
+
+Usuario Sitio wordpress
+pixartjeti3312
+El usuario principal SSH para el sitio.
+Contraseña del usuario del sitio
+4nXMBYBZer2axnqovRok
+Genera contraseña nueva
+Nombre del usuario administrador
+admin
+Contraseña del administrador
+iXTrQ3ukYT3dQtLI9fvI
+Genera contraseña nueva
+
+
+Nombre de dominio
+http://129.151.239.138/
+Url del Proxy Inverso
+http://127.0.0.1:8000
+Usuario Sitio
+hola-1
+El usuario principal SSH para el sitio.
+Contraseña del usuario del sitio
+owYDa513uVIj8uBNKlfr
+Genera contraseña nueva
