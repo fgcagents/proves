@@ -220,8 +220,15 @@ function filterData() {
             }))
             .filter(entry => {
                 const entryTimeMinutes = convertTimeToMinutes(entry.hora);
-                const matchesTimeRange = !horaIniciMinuts || !horaFiMinuts || 
-                    (entryTimeMinutes >= horaIniciMinuts && entryTimeMinutes <= horaFiMinuts);
+            
+                // Si no hi ha horaInici, accepta qualsevol hora
+                if (horaIniciMinuts === null) return true;
+    
+                // Si hi ha horaInici però no hi ha horaFi, accepta només les hores posteriors a horaInici
+                if (horaFiMinuts === null) return entryTimeMinutes >= horaIniciMinuts;
+    
+                // Si hi ha tant horaInici com horaFi, filtra dins del rang
+                return entryTimeMinutes >= horaIniciMinuts && entryTimeMinutes <= horaFiMinuts;
                 
                 return (
                     (!filters.tren || entry.tren.toLowerCase().includes(filters.tren.toLowerCase())) &&
