@@ -219,7 +219,9 @@ function filterData() {
                 hora: item[station]
             }))
             .filter(entry => {
-const matchesTimeRange = (horaIniciMinuts === null || entryTimeMinutes >= horaIniciMinuts) && (horaFiMinuts === null || entryTimeMinutes <= horaFiMinuts);
+                const entryTimeMinutes = convertTimeToMinutes(entry.hora);
+                const matchesTimeRange = !horaIniciMinuts || !horaFiMinuts || 
+                    (entryTimeMinutes >= horaIniciMinuts && entryTimeMinutes <= horaFiMinuts);
                 
                 return (
                     (!filters.tren || entry.tren.toLowerCase().includes(filters.tren.toLowerCase())) &&
