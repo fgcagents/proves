@@ -90,9 +90,7 @@ th, td {
     text-align: center;                   
     font-size: .9rem;
     font-weight: 400;
-    letter-spacing: 0.1rem;
-    width: 2.5rem;
-    min-width: 2.5rem;
+    letter-spacing: 0.1rem;   
 }
 
 th {
