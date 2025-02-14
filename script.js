@@ -228,7 +228,7 @@ function filterData() {
                 if (horaFiMinuts === null) return entryTimeMinutes >= horaIniciMinuts;
     
                 // Si hi ha tant horaInici com horaFi, filtra dins del rang
-                return entryTimeMinutes >= horaIniciMinuts && entryTimeMinutes <= horaFiMinuts;
+                (entryTimeMinutes >= horaIniciMinuts && entryTimeMinutes <= horaFiMinuts);
                 
                 return (
                     (!filters.tren || entry.tren.toLowerCase().includes(filters.tren.toLowerCase())) &&
