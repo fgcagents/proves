@@ -8,7 +8,7 @@
 
 body {
     font-family: 'Roboto', Arial, sans-serif;
-    max-width: 800px;
+    max-width: 600px;
     margin: auto;
     padding: 20px;
     background-color: var(--background-color);
@@ -91,8 +91,6 @@ th, td {
     font-size: .9rem;
     font-weight: 400;
     letter-spacing: 0.1rem;
-    width: 2.5rem;
-    min-width: 2.5rem;
 }
 
 th {
