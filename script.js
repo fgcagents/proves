@@ -210,7 +210,7 @@ function filterData() {
     
     filteredData = data.flatMap(item => 
         Object.keys(item)
-            .filter(key => key !== 'Tren' && key !== 'Linia' && key !== 'A/D' && item[key])
+            .filter(key => !['Tren', 'Linia', 'A/D', 'Serveis', 'Torn', 'Tren_S'].includes(key) && item[key])
             .map(station => ({
                 tren: item.Tren,
                 linia: item.Linia,
