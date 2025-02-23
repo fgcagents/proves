@@ -78,6 +78,11 @@ input:focus, select:focus {
     animation: fadeIn 0.3s ease;
 }
 
+.highlighted-time {
+    color: #ff0000; /* Color rojo, puedes cambiarlo al que prefieras */
+    font-weight: bold;
+}
+
 table {
     width: 100%;
     border-collapse: collapse;

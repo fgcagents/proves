@@ -245,6 +245,18 @@ function filterData() {
     updateTable();
 }
 
+// Función auxiliar canvi color antes de updateTable
+function shouldHighlightTime(entry) {
+    // Ejemplo con múltiples condiciones
+    const isTargetLine = entry.linia === "R5" || entry.linia === "R6";
+    const timeInMinutes = timeToMinutes(entry.hora);
+    const isInTimeRange = timeInMinutes >= timeToMinutes("07:00") && 
+                         timeInMinutes <= timeToMinutes("09:00");
+    const isTargetStation = ["MV", "CO"].includes(entry.estacio);
+    
+    return isTargetLine && isInTimeRange && isTargetStation;
+}
+
 // Funció per actualitzar la taula
 function updateTable() {
     const tbody = elements.resultats.querySelector('tbody');
@@ -263,12 +275,16 @@ function updateTable() {
     itemsToShow.forEach((entry, index) => {
         const row = document.createElement('tr');
         const rowNumber = startIndex + index + 1;
+
+        // Determinar si se debe resaltar la hora
+        const horaClass = shouldHighlightTime(entry) ? 'highlighted-time' : '';
+
         row.innerHTML = `
             <td class="row-number">${rowNumber}</td>
             <td>${entry.ad}</td>
             <td>${entry.tren}</td>
             <td>${entry.estacio}</td>
-            <td>${entry.hora}</td>
+            <td class="${horaClass}">${entry.hora}</td>
             <td>${entry.linia}</td>
         `;
         fragment.appendChild(row);
