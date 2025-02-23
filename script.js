@@ -257,7 +257,7 @@ function shouldHighlightTime(entry) {
 
     // Comprueba el rango de tiempo
     const timeInMinutes = timeToMinutes(entry.hora);
-    const isInTimeRange = timeInMinutes >= timeToMinutes("07:00") && 
+    const isInTimeRange = timeInMinutes >= timeToMinutes("05:00") && 
                          timeInMinutes <= timeToMinutes("22:10");
     
     // Retorna true si cumple con cualquiera de las condiciones
