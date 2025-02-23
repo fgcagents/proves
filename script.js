@@ -247,14 +247,21 @@ function filterData() {
 
 // Función auxiliar canvi color antes de updateTable
 function shouldHighlightTime(entry) {
-    // Ejemplo con múltiples condiciones
-    const isTargetLine = entry.linia === "R5" || entry.linia === "R6";
+    // Define las estaciones para cada línea
+    const r5Stations = ["MV", "CL", "CG"];
+    const r6Stations = ["MV", "CL"];
+
+    // Comprueba la línea y las estaciones correspondientes
+    const isR5 = entry.linia === "R5" && r5Stations.includes(entry.estacio);
+    const isR6 = entry.linia === "R6" && r6Stations.includes(entry.estacio);
+
+    // Comprueba el rango de tiempo
     const timeInMinutes = timeToMinutes(entry.hora);
     const isInTimeRange = timeInMinutes >= timeToMinutes("07:00") && 
-                         timeInMinutes <= timeToMinutes("09:00");
-    const isTargetStation = ["MV", "CO"].includes(entry.estacio);
+                         timeInMinutes <= timeToMinutes("22:10");
     
-    return isTargetLine && isInTimeRange && isTargetStation;
+    // Retorna true si cumple con cualquiera de las condiciones
+    return (isR5 || isR6) && isInTimeRange;
 }
 
 // Funció per actualitzar la taula
