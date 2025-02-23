@@ -79,8 +79,9 @@ input:focus, select:focus {
 }
 
 .highlighted-time {
-    color: #ff0000; /* Color rojo, puedes cambiarlo al que prefieras */
+    color: #cc220f; /* Color rojo, puedes cambiarlo al que prefieras */
     font-weight: bold;
+    font-size: 0.6rem;
 }
 
 table {
