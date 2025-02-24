@@ -250,20 +250,24 @@ function shouldHighlightTime(entry) {
     // Define las estaciones para cada línea
     const r5Stations = ["MV", "CL", "CG"];
     const r6Stations = ["MV", "CL"];
+    const r50Stations = ["MG", "ML", "CG", "CL", "CR", "QC", "PL", "MV", "ME", "AE", "CB"];
+    const r60Stations = ["MG", "ML", "CG", "CR", "QC", "PA", "PL", "MV", "ME", "BE", "CP"];
 
     // Comprueba la línea y las estaciones correspondientes
     const isR5 = entry.linia === "R5" && r5Stations.includes(entry.estacio);
     const isR6 = entry.linia === "R6" && r6Stations.includes(entry.estacio);
+    const isR50 = entry.linia === "R50" && r50Stations.includes(entry.estacio);
+    const isR60 = entry.linia === "R60" && r60Stations.includes(entry.estacio);
 
     // Comprueba si es un tren descendente y después de las 22:10
     const isDescendente = entry.ad === "D";
     const timeInMinutes = timeToMinutes(entry.hora);
-    const isAfterCutoffTime = timeInMinutes >= timeToMinutes("22:10");
+    const isAfterCutoffTime = timeInMinutes >= timeToMinutes("22:00");
     
     // Retorna true si:
-    // - Es R5 o R6 en sus estaciones correspondientes
+    // - Es R5, R6, R50 o R60 en sus estaciones correspondientes
     // - Y NO cumple ambas condiciones: ser descendente Y posterior a 22:10
-    return (isR5 || isR6) && !(isDescendente && isAfterCutoffTime);
+    return (isR5 || isR6 || isR50 || isR60) && !(isDescendente && isAfterCutoffTime);
 }
 
 // Funció per actualitzar la taula
