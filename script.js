@@ -255,15 +255,15 @@ function shouldHighlightTime(entry) {
     const isR5 = entry.linia === "R5" && r5Stations.includes(entry.estacio);
     const isR6 = entry.linia === "R6" && r6Stations.includes(entry.estacio);
 
-    // Comprueba si es un tren descendente
+    // Comprueba si es un tren descendente y después de las 22:10
     const isDescendente = entry.ad === "D";
-
-    // Comprueba el rango de tiempo (ahora negado)
     const timeInMinutes = timeToMinutes(entry.hora);
     const isAfterCutoffTime = timeInMinutes >= timeToMinutes("22:10");
     
-    // Retorna true si es R5 o R6 Y NO es después de las 22:10 Y NO es descendente
-    return (isR5 || isR6) && !isAfterCutoffTime && !isDescendente;
+    // Retorna true si:
+    // - Es R5 o R6 en sus estaciones correspondientes
+    // - Y NO cumple ambas condiciones: ser descendente Y posterior a 22:10
+    return (isR5 || isR6) && !(isDescendente && isAfterCutoffTime);
 }
 
 // Funció per actualitzar la taula
