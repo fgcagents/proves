@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualitació ISIC</title>
+    <!-- Importar la fuente desde Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@200..700&display=swap">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <label for="station-search">Pantalles ISIC</label>
+        <div class="search-container">
+            <input type="text" id="station-search" placeholder="Escriu nom estació...">
+            <div class="search-results"></div>
+        </div>
+        <div class="image-container">
+            <img class="img-fluid" id="isic-next-pc" src="https://geotren.fgc.cat/isic/pc?_=" alt="Horari">
+        </div>
+    </div>
+
+    <!-- Footer amb copyright -->
+    <footer>
+        J_E_O ©  <span id="current-year"></span>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
