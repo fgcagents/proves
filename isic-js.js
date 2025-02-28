@@ -1,3 +1,6 @@
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("Això només s'executa a la pàgina 1.");
+    // Afegir aquí funcionalitats específiques de Pantalles ISIC.
 var img = document.getElementById("isic-next-pc");
 var searchInput = document.getElementById("station-search");
 var searchResults = document.querySelector(".search-results");
@@ -108,3 +111,4 @@ document.addEventListener("click", function(e) {
 
 // Funció per mostrar l'any actual al footer
 document.getElementById('current-year').textContent = new Date().getFullYear();
+});
