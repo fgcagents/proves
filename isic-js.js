@@ -35,7 +35,6 @@ var sources = [
     {name: "Ildefons Cerdà", url: "https://geotren.fgc.cat/isic/ic?_="},
     {name: "L'Hospitalet", url: "https://geotren.fgc.cat/isic/lh?_="},
     {name: "Quatre Camins", url: "https://geotren.fgc.cat/isic/qc?_="},
-    {name: "Pallejà", url: "https://geotren.fgc.cat/isic/pa?_="},
     {name: "Muntaner", url: "https://geotren.fgc.cat/isic/mn?_="},
     {name: "Pàdua", url: "https://geotren.fgc.cat/isic/pd?_="},
     {name: "El Putxet", url: "https://geotren.fgc.cat/isic/ep?_="},
