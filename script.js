@@ -215,6 +215,8 @@ function filterData() {
                 tren: item.Tren,
                 linia: item.Linia,
                 ad: item['A/D'],
+                torn: item.Torn,
+                tren_s: item.Tren_S,
                 estacio: station,
                 hora: item[station]
             }))
