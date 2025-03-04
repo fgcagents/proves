@@ -301,6 +301,8 @@ function updateTable() {
             <td>${entry.estacio}</td>
             <td class="${horaClass}">${entry.hora}</td>
             <td>${entry.linia}</td>
+            <td class="extra-col">${entry.torn}</td>
+            <td class="extra-col">${entry.tren_s}</td>
         `;
         fragment.appendChild(row);
     });
