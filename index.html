@@ -1,73 +1,104 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ca">
 <head>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-6CHCYVEYTN"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-6CHCYVEYTN'); -->
-</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FGC utilitats</title>
-    <link rel="stylesheet" href="styles.css"> <!-- Fitxer CSS extern -->
-    <link rel="stylesheet" href="menu.css"> <!-- Estils per al menú -->
+    <title>Itinerari LA51_2 07/2023 ver.sep/2024</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@200..700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat%3A400%2C700%7CBitter%3A400%2C700&display=swap">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="menu.css"> <!-- Estils del menú -->
 </head>
-<body id="index">
+<body>
     <!-- Menú reutilitzable -->
     <div class="navbar">
-        <a href="index.html" style="font-weight: 400;">FGC utilitats</a>
+        <a href="index.html" style="font-weight: 400;">Itinerari LA51_2 jul/2023</a>
         <div class="menu-toggle" id="menu-toggle">
             <div></div>
             <div></div>
             <div></div>
         </div>
         <div class="menu" id="menu">
-            <a href="index.html">Cercador Horari</a>
-            <a href="calculadora-devolucions.html">Devolucions</a>
-            <a href="isic.html">Pantalles ISIC</a>
+            <a href="#" data-file="itinerari_LA51_2_0_1_asc_desc.json">000/100</a>
+            <a href="#" data-file="itinerari_LA51_2_4_5_asc_desc.json">400/500</a>
+            <a href="#" data-file="itinerari_LA51_2_2_3_asc_desc.json">200/300</a>
         </div>
     </div>
-    <h1>Cercador horari</h1>
-
-    <!-- Formulari per triar l'estació, la línia, el nombre de trens i l'hora -->
-    <form id="station-form">
-        <div class="form-group">
-            <input type="text" id="station-code" placeholder="Codi de l'estació (PC,PE,...)" required>
-        </div>
+    <h1 style="text-align: center;">Servei 000/100</h1>
+    
+    <div class="search-container">
         <div class="form-row">
             <div class="form-group">
-                <input type="text" id="line-name" placeholder="Línia (opcional)">
+                <label for="tren">Tren</label>
+                <input type="text" id="tren" placeholder="Cerca per tren..." aria-label="Cerca per número de tren">
             </div>
-            <div class="form-group">
-                <input type="number" id="train-count" placeholder="Trens (Min. 8)" min="8" required>
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="ref-time">
-                <p style="font-size:0.8em;">Hora de referència o deixa-ho en blanc per l'hora actual:</p>
-            </label>
-            <input type="time" id="selected-time" placeholder="Tria l'hora">
-        </div>
-        <input type="submit" value="Actualitza">
-    </form>
 
-    <!-- Encapsular només els resultats -->
-    <div class="result-box">
-        <div class="station-header" id="station-name">Estació</div>
-        <div class="train-schedule" id="train-schedule">
-            <!-- Aquí es mostraran les dades dels trens -->
+            <div class="form-group">
+                <label for="linia">Línia</label>
+                <input type="text" id="linia" placeholder="Cerca per línia..." aria-label="Cerca per línia de tren">
+            </div>
+
+            <div class="form-group">
+                <label for="ad">ASC/DES</label>
+                <select id="ad" aria-label="Selecciona Anada o Destí" onchange="updateTableTitle()">
+                    <option value="">Tots</option>
+                    <option value="A">Ascendent</option>
+                    <option value="D">Descendent</option>
+                </select>
+            </div>
         </div>
+
+        <div class="form-group">
+            <label for="estacio">Estació</label>
+            <input list="estacions" id="estacio" placeholder="Cerca per estació..." aria-label="Cerca per estació">
+            <datalist id="estacions">
+            </datalist>
+        </div>
+
+        <div class="form-group">
+            <label>Horari</label>
+            <div class="time-range">
+                <div class="time-input">
+                    <input type="time" id="horaInici" aria-label="Hora inici">
+                </div>
+                <div class="time-input">
+                    <input type="time" id="horaFi" aria-label="Hora fi">
+                </div>
+            </div>
+        </div>
+
+        <button class="clear-filters" id="clearFilters">Netejar filtres</button>
     </div>
 
+    <div class="loading" id="loading">Carregant...</div>
+    <div class="error-message" id="errorMessage"></div>
+    
+    <div class="result-container" id="resultContainer">
+        <table id="resultats">
+            <h2 id="table-title" style="text-align: center;">Resultats</h2>
+            <thead>
+                <tr>
+                    <th class="row-number">#</th>
+                    <th>A/D</th>
+                    <th>Tren</th>
+                    <th>Estació</th>
+                    <th>Hora</th>
+                    <th>Línia</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="no-results">
+                    <td colspan="6">Introdueix algun criteri de cerca.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
     <footer>
-        J_E_O © <span id="current-year"></span>
+        Itinerari LA51_2 07/2023 ver.sep/2024<br>
+        J_E_O © <span id="current-year"></span>  
     </footer>
     <script src="menu.js"></script> <!-- Comportament del menú -->
-    <script src="index.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>

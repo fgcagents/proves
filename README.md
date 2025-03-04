@@ -1,2 +1,0 @@
-# proves
-directori de proves
