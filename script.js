@@ -74,6 +74,7 @@ const timeToMinutes = timeStr => {
     return hours * 60 + minutes;
 };
 
+/*
 const convertTimeToMinutes = timeStr => {
     if (!timeStr) return null;
     let [hours, minutes] = timeStr.split(':').map(Number);
@@ -85,6 +86,7 @@ const convertTimeToMinutes = timeStr => {
     }
     return hours * 60 + minutes;
 };
+*/
 
 // Función para cargar datos desde un archivo dado
 async function loadData(filename = 'itinerari_LA51_2_0_1_asc_desc.json') {
@@ -207,6 +209,32 @@ function filterData() {
                 estacio: station,
                 hora: item[station]
             }))
+
+            // Dins de filterData, en el .filter de cada entrada:
+            .filter(entry => {
+                const entryTimeMin = timeToMinutes(entry.hora);
+                let matchesTimeRange = true;
+                if (horaIniciMin !== null) {
+                    if (horaFiMin === null) {
+                        matchesTimeRange = entryTimeMin >= horaIniciMin;
+                    } else {
+                        // Si el rang passa per mitjanit (ex: 23:00 a 01:00)
+                        if (horaIniciMin > horaFiMin) {
+                            matchesTimeRange = entryTimeMin >= horaIniciMin || entryTimeMin <= horaFiMin;
+                        } else {
+                            matchesTimeRange = entryTimeMin >= horaIniciMin && entryTimeMin <= horaFiMin;
+                        }
+                    }
+                }
+                return (
+                    (!filters.tren || entry.tren.toLowerCase().includes(filters.tren.toLowerCase())) &&
+                    (!filters.linia || entry.linia.toLowerCase().includes(filters.linia.toLowerCase())) &&
+                    (!filters.ad || entry.ad === filters.ad) &&
+                    (!filters.estacio || entry.estacio.toLowerCase().includes(filters.estacio.toLowerCase())) &&
+                    matchesTimeRange
+                );
+            })  
+            /*
             .filter(entry => {
                 const entryTimeMin = convertTimeToMinutes(entry.hora);
                 let matchesTimeRange = true;
@@ -221,6 +249,7 @@ function filterData() {
                     matchesTimeRange
                 );
             })
+            */
     );
 
     filteredData = sortResultsByTime(filteredData);
