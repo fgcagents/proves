@@ -212,20 +212,21 @@ function filterData() {
 
             // Dins de filterData, en el .filter de cada entrada:
             .filter(entry => {
-                const entryTimeMin = timeToMinutes(entry.hora);
-                let matchesTimeRange = true;
-                if (horaIniciMin !== null) {
-                    if (horaFiMin === null) {
-                        matchesTimeRange = entryTimeMin >= horaIniciMin;
-                    } else {
-                        // Si el rang passa per mitjanit (ex: 23:00 a 01:00)
-                        if (horaIniciMin > horaFiMin) {
-                            matchesTimeRange = entryTimeMin >= horaIniciMin || entryTimeMin <= horaFiMin;
-                        } else {
-                            matchesTimeRange = entryTimeMin >= horaIniciMin && entryTimeMin <= horaFiMin;
-                        }
-                    }
-                }
+    const entryTimeMin = timeToMinutes(entry.hora);
+    let matchesTimeRange = true;
+
+    if (horaIniciMin !== null) {
+        if (horaFiMin === null) {
+            matchesTimeRange = entryTimeMin >= horaIniciMin;
+        } else {
+            // Si el rango pasa por medianoche (ej: 23:00 a 01:00)
+            if (horaIniciMin > horaFiMin) {
+                matchesTimeRange = entryTimeMin >= horaIniciMin || entryTimeMin <= horaFiMin;
+            } else {
+                matchesTimeRange = entryTimeMin >= horaIniciMin && entryTimeMin <= horaFiMin;
+            }
+        }
+    }
                 return (
                     (!filters.tren || entry.tren.toLowerCase().includes(filters.tren.toLowerCase())) &&
                     (!filters.linia || entry.linia.toLowerCase().includes(filters.linia.toLowerCase())) &&
