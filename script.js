@@ -210,31 +210,40 @@ function filterData() {
                 hora: item[station]
             }))
 
-            // Dins de filterData, en el .filter de cada entrada:
-            .filter(entry => {
-    const entryTimeMin = timeToMinutes(entry.hora);
-    let matchesTimeRange = true;
+        // Dins de filterData, en el .filter de cada entrada:
+        .filter(entry => {
+            const entryTimeMin = timeToMinutes(entry.hora);
+            let matchesTimeRange = true;
 
-    if (horaIniciMin !== null) {
-        if (horaFiMin === null) {
-            matchesTimeRange = entryTimeMin >= horaIniciMin;
-        } else {
-            // Si el rango pasa por medianoche (ej: 23:00 a 01:00)
-            if (horaIniciMin > horaFiMin) {
-                matchesTimeRange = entryTimeMin >= horaIniciMin || entryTimeMin <= horaFiMin;
-            } else {
-                matchesTimeRange = entryTimeMin >= horaIniciMin && entryTimeMin <= horaFiMin;
+            if (horaIniciMin !== null) {
+                if (horaFiMin === null) {
+                    // Si solo se proporciona hora de inicio
+                    // Asumimos que horas menores a la hora de inicio son trenes de después de medianoche
+                    if (entryTimeMin < horaIniciMin && entryTimeMin < 240) { // 240 minutos = 4:00 AM
+                        // Probablemente es un tren de después de medianoche
+                        matchesTimeRange = true;
+                    } else {
+                        // Tren normal después de la hora de inicio
+                        matchesTimeRange = entryTimeMin >= horaIniciMin;
+                    }
+                } else {
+                    // Si el rango pasa por medianoche (ej: 23:00 a 01:00)
+                    if (horaIniciMin > horaFiMin) {
+                        matchesTimeRange = entryTimeMin >= horaIniciMin || entryTimeMin <= horaFiMin;
+                    } else {
+                        matchesTimeRange = entryTimeMin >= horaIniciMin && entryTimeMin <= horaFiMin;
+                    }
+                }
             }
-        }
-    }
-                return (
-                    (!filters.tren || entry.tren.toLowerCase().includes(filters.tren.toLowerCase())) &&
-                    (!filters.linia || entry.linia.toLowerCase().includes(filters.linia.toLowerCase())) &&
-                    (!filters.ad || entry.ad === filters.ad) &&
-                    (!filters.estacio || entry.estacio.toLowerCase().includes(filters.estacio.toLowerCase())) &&
-                    matchesTimeRange
-                );
-            })  
+            
+            return (
+                (!filters.tren || entry.tren.toLowerCase().includes(filters.tren.toLowerCase())) &&
+                (!filters.linia || entry.linia.toLowerCase().includes(filters.linia.toLowerCase())) &&
+                (!filters.ad || entry.ad === filters.ad) &&
+                (!filters.estacio || entry.estacio.toLowerCase().includes(filters.estacio.toLowerCase())) &&
+                matchesTimeRange
+            );
+        })  
             /*
             .filter(entry => {
                 const entryTimeMin = convertTimeToMinutes(entry.hora);
