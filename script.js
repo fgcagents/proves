@@ -293,14 +293,20 @@ function updateTable() {
             <td class="${horaClass}">${entry.hora}</td>
             <td>${entry.linia}</td>
             <td class="extra-col">${entry.torn}</td>
-            <td class="extra-col">${entry.tren_s}</td>
+            <td class="extra-col"><a href="#" class="train-s-link" data-train="${entry.tren_s}">${entry.tren_s}</a></td>
         `;
-        // Agregar el listener para el enlace del tren
+        // Listener para el enlace del tren principal
         const trainLink = row.querySelector('.train-link');
         trainLink.addEventListener('click', (e) => {
             e.preventDefault();
-            // Actualiza el filtro del tren con el valor seleccionado y refresca la tabla
             elements.tren.value = entry.tren;
+            filterData();
+        });
+        // Listener para el enlace del tren_s
+        const trainSLink = row.querySelector('.train-s-link');
+        trainSLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            elements.tren.value = entry.tren_s;
             filterData();
         });
 
