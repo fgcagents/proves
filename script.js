@@ -75,20 +75,6 @@ const timeToMinutes = timeStr => {
     return hours * 60 + minutes;
 };
 
-/*
-const convertTimeToMinutes = timeStr => {
-    if (!timeStr) return null;
-    let [hours, minutes] = timeStr.split(':').map(Number);
-    const timeLower = timeStr.toLowerCase();
-    if (timeLower.includes('pm') && hours < 12) {
-        hours += 12;
-    } else if (timeLower.includes('am') && hours === 12) {
-        hours = 0;
-    }
-    return hours * 60 + minutes;
-};
-*/
-
 // Función para cargar datos desde un archivo dado
 async function loadData(filename = 'itinerari_LA51_2_0_1_asc_desc.json') {
     try {
@@ -200,6 +186,55 @@ function filterData() {
     const horaIniciMin = timeToMinutes(filters.horaInici);
     const horaFiMin = timeToMinutes(filters.horaFi);
 
+    if (filters.torn) {
+        // Si se filtra por Torn, se lista un SOLO registro (la primera estación) por cada tren cuyo Torn coincida
+        filteredData = data
+            .filter(item => item.Torn && item.Torn.toLowerCase().includes(filters.torn.toLowerCase()))
+            .map(item => {
+                const stations = Object.keys(item)
+                    .filter(key => !['Tren', 'Linia', 'A/D', 'Serveis', 'Torn', 'Tren_S'].includes(key) && item[key]);
+                if (stations.length > 0) {
+                    const firstStation = stations[0];
+                    return {
+                        tren: item.Tren,
+                        linia: item.Linia,
+                        ad: item['A/D'],
+                        torn: item.Torn,
+                        tren_s: item.Tren_S,
+                        estacio: firstStation,
+                        hora: item[firstStation]
+                    };
+                }
+            })
+            .filter(entry => {
+                if (!entry) return false;
+                const entryTimeMin = timeToMinutes(entry.hora);
+                let matchesTimeRange = true;
+                if (horaIniciMin !== null) {
+                    if (horaFiMin === null) {
+                        if (entryTimeMin < horaIniciMin && entryTimeMin < 240) {
+                            matchesTimeRange = true;
+                        } else {
+                            matchesTimeRange = entryTimeMin >= horaIniciMin;
+                        }
+                    } else {
+                        if (horaIniciMin > horaFiMin) {
+                            matchesTimeRange = entryTimeMin >= horaIniciMin || entryTimeMin <= horaFiMin;
+                        } else {
+                            matchesTimeRange = entryTimeMin >= horaIniciMin && entryTimeMin <= horaFiMin;
+                        }
+                    }
+                }
+                return (
+                    (!filters.tren || entry.tren.toLowerCase().includes(filters.tren.toLowerCase())) &&
+                    (!filters.linia || entry.linia.toLowerCase().includes(filters.linia.toLowerCase())) &&
+                    (!filters.ad || entry.ad === filters.ad) &&
+                    (!filters.estacio || entry.estacio.toLowerCase().includes(filters.estacio.toLowerCase())) &&
+                    matchesTimeRange
+                );
+            });
+    } else {
+    // Sin filtro Torn, se listan todas las estaciones (itinerario completo)
     filteredData = data.flatMap(item =>
         Object.keys(item)
             .filter(key => !['Tren', 'Linia', 'A/D', 'Serveis', 'Torn', 'Tren_S'].includes(key) && item[key])
@@ -247,7 +282,7 @@ function filterData() {
             );
         })  
     );
-
+    }
     filteredData = sortResultsByTime(filteredData);
     updateTable();
 }
