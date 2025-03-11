@@ -12,6 +12,7 @@ const elements = {
     linia: document.getElementById('linia'),
     ad: document.getElementById('ad'),
     estacio: document.getElementById('estacio'),
+    torn: document.getElementById('torn'), // Nuevo filtro para Torn
     horaInici: document.getElementById('horaInici'),
     horaFi: document.getElementById('horaFi'),
     resultContainer: document.getElementById('resultContainer'),
@@ -182,6 +183,7 @@ function filterData() {
         linia: elements.linia.value.trim(),
         ad: elements.ad.value.trim(),
         estacio: elements.estacio.value.trim(),
+        torn: elements.torn.value.trim(), // Nuevo filtro
         horaInici: elements.horaInici.value.trim(),
         horaFi: elements.horaFi.value.trim()
     };
@@ -209,8 +211,6 @@ function filterData() {
                 estacio: station,
                 hora: item[station]
             }))
-
-        // Dins de filterData, en el .filter de cada entrada:
         .filter(entry => {
             const entryTimeMin = timeToMinutes(entry.hora);
             let matchesTimeRange = true;
@@ -223,7 +223,7 @@ function filterData() {
                         // Probablemente es un tren de después de medianoche
                         matchesTimeRange = true;
                     } else {
-                        // Tren normal después de la hora de inicio
+// Tren normal después de la hora de inicio
                         matchesTimeRange = entryTimeMin >= horaIniciMin;
                     }
                 } else {
@@ -241,25 +241,10 @@ function filterData() {
                 (!filters.linia || entry.linia.toLowerCase().includes(filters.linia.toLowerCase())) &&
                 (!filters.ad || entry.ad === filters.ad) &&
                 (!filters.estacio || entry.estacio.toLowerCase().includes(filters.estacio.toLowerCase())) &&
+                (!filters.torn || entry.torn.toLowerCase().includes(filters.torn.toLowerCase())) && // Filtro para Torn
                 matchesTimeRange
             );
         })  
-            /*
-            .filter(entry => {
-                const entryTimeMin = convertTimeToMinutes(entry.hora);
-                let matchesTimeRange = true;
-                if (horaIniciMin !== null) {
-                    matchesTimeRange = horaFiMin === null ? entryTimeMin >= horaIniciMin : (entryTimeMin >= horaIniciMin && entryTimeMin <= horaFiMin);
-                }
-                return (
-                    (!filters.tren || entry.tren.toLowerCase().includes(filters.tren.toLowerCase())) &&
-                    (!filters.linia || entry.linia.toLowerCase().includes(filters.linia.toLowerCase())) &&
-                    (!filters.ad || entry.ad === filters.ad) &&
-                    (!filters.estacio || entry.estacio.toLowerCase().includes(filters.estacio.toLowerCase())) &&
-                    matchesTimeRange
-                );
-            })
-            */
     );
 
     filteredData = sortResultsByTime(filteredData);
