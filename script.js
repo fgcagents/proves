@@ -141,6 +141,7 @@ function clearFilters() {
     elements.linia.value = '';
     elements.ad.value = '';
     elements.estacio.value = '';
+    elements.torn.value = ''; // Limpiar filtro Torn
     elements.horaInici.value = '';
     elements.horaFi.value = '';
     elements.resultContainer.style.display = 'none';
@@ -328,6 +329,7 @@ function initInputListeners() {
     elements.linia.addEventListener('input', debounce(filterData, DEBOUNCE_DELAY));
     elements.ad.addEventListener('change', debounce(filterData, DEBOUNCE_DELAY));
     elements.estacio.addEventListener('input', debounce(filterData, DEBOUNCE_DELAY));
+    elements.torn.addEventListener('input', debounce(filterData, DEBOUNCE_DELAY)); // Nuevo listener para Torn
     elements.horaInici.addEventListener('input', debounce(filterData, DEBOUNCE_DELAY));
     elements.horaFi.addEventListener('input', debounce(filterData, DEBOUNCE_DELAY));
     elements.clearFilters.addEventListener('click', clearFilters);
