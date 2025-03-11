@@ -297,3 +297,9 @@ th.row-number {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
 }
+
+a.train-link {
+    color: rgb(46, 46, 78);
+    /*text-decoration: underline;*/
+    cursor: pointer;
+}
