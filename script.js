@@ -299,6 +299,7 @@ function updateTable() {
         const trainLink = row.querySelector('.train-link');
         trainLink.addEventListener('click', (e) => {
             e.preventDefault();
+            clearFilters(); // Limpiar filtros existentes
             elements.tren.value = entry.tren;
             filterData();
         });
@@ -306,6 +307,7 @@ function updateTable() {
         const trainSLink = row.querySelector('.train-s-link');
         trainSLink.addEventListener('click', (e) => {
             e.preventDefault();
+            clearFilters(); // Limpiar filtros existentes
             elements.tren.value = entry.tren_s;
             filterData();
         });
