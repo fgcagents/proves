@@ -186,7 +186,62 @@ function filterData() {
     const horaIniciMin = timeToMinutes(filters.horaInici);
     const horaFiMin = timeToMinutes(filters.horaFi);
 
-    if (filters.torn) {
+    if (filters.linia && !filters.estacio) {
+        const seenTrains = new Set();
+        filteredData = data
+            .filter(item => item.Linia.toLowerCase().includes(filters.linia.toLowerCase()))
+            .flatMap(item => {
+                if (seenTrains.has(item.Tren)) return [];
+                
+                const stations = Object.keys(item)
+                    .filter(key => !['Tren', 'Linia', 'A/D', 'Serveis', 'Torn', 'Tren_S'].includes(key) && item[key])
+                    .sort((a, b) => {
+                        const tA = timeToMinutes(item[a]);
+                        const tB = timeToMinutes(item[b]);
+                        return tA - tB;
+                    });
+
+                for (const station of stations) {
+                    const timeMin = timeToMinutes(item[station]);
+                    let matchesTimeRange = true;
+
+                    if (horaIniciMin !== null) {
+                        if (horaFiMin === null) {
+                            if (timeMin < horaIniciMin && timeMin < 240) {
+                                matchesTimeRange = true;
+                            } else {
+                                matchesTimeRange = timeMin >= horaIniciMin;
+                            }
+                        } else {
+                            if (horaIniciMin > horaFiMin) {
+                                matchesTimeRange = timeMin >= horaIniciMin || timeMin <= horaFiMin;
+                            } else {
+                                matchesTimeRange = timeMin >= horaIniciMin && timeMin <= horaFiMin;
+                            }
+                        }
+                    }
+
+                    if (matchesTimeRange) {
+                        seenTrains.add(item.Tren);
+                        return [{
+                            tren: item.Tren,
+                            linia: item.Linia,
+                            ad: item['A/D'],
+                            torn: item.Torn,
+                            tren_s: item.Tren_S,
+                            estacio: station,
+                            hora: item[station]
+                        }];
+                    }
+                }
+                return [];
+            })
+            .filter(entry => (
+                (!filters.tren || entry.tren.toLowerCase().includes(filters.tren.toLowerCase())) &&
+                (!filters.ad || entry.ad === filters.ad) &&
+                (!filters.torn || entry.torn.toLowerCase().includes(filters.torn.toLowerCase()))
+            ));
+    } else if (filters.torn) {
         // Si se filtra por Torn, se lista un SOLO registro por cada tren cuyo Torn coincida,
         // tomando la estación con el horario más bajo
         filteredData = data
