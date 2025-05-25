@@ -1,7 +1,5 @@
 // Variables globals
 let data = [];
-let cachedApiData = []; // Variable per guardar la cache de l'API
-let trainMapping = {}; // Nuevo mapeo: clave = nombre del tren del JSON, valor = id de la API
 let currentPage = 0;
 const ITEMS_PER_PAGE = 33;
 const DEBOUNCE_DELAY = 300;
@@ -14,7 +12,7 @@ const elements = {
     linia: document.getElementById('linia'),
     ad: document.getElementById('ad'),
     estacio: document.getElementById('estacio'),
-    torn: document.getElementById('torn'),
+    torn: document.getElementById('torn'), // Nuevo filtro para Torn
     horaInici: document.getElementById('horaInici'),
     horaFi: document.getElementById('horaFi'),
     resultContainer: document.getElementById('resultContainer'),
@@ -77,7 +75,7 @@ const timeToMinutes = timeStr => {
     return hours * 60 + minutes;
 };
 
-// Función per carregar dades des d'un fitxer (JSON)
+// Función para cargar datos desde un archivo dado
 async function loadData(filename = 'itinerari_LA51_2_0_1_asc_desc.json') {
     try {
         elements.loading.classList.add('visible');
@@ -95,106 +93,6 @@ async function loadData(filename = 'itinerari_LA51_2_0_1_asc_desc.json') {
     }
 }
 
-// Modificar la función loadApiCache para validar la estructura
-function loadApiCache() {
-    const cacheStr = localStorage.getItem('trainData');
-    if (cacheStr) {
-        try {
-            const cacheObj = JSON.parse(cacheStr);
-            // Asegurar que la estructura es correcta
-            return Array.isArray(cacheObj?.results) ? cacheObj.results : [];
-        } catch (err) {
-            console.error("Error parsing API cache:", err);
-        }
-    }
-    return [];
-}
-
-// Nueva función: Construir el mapeo de trenes en circulación
-function buildTrainMapping() {
-    trainMapping = {}; // Reiniciamos el mapeo
-    const now = new Date();
-    const currentTimeMinutes = now.getHours() * 60 + now.getMinutes();
-
-    // Limpiar mapeos antiguos
-    Object.keys(trainMapping).forEach(train => {
-        const item = data.find(d => d.Tren === train);
-        if (!item) delete trainMapping[train];
-    });
-
-    data.forEach(item => {
-        // Claves a excluir (no son estaciones)
-        const excludedKeys = ["Tren", "Linia", "A/D", "Serveis", "Torn", "Tren_S"];
-        Object.keys(item).forEach(key => {
-            if (!excludedKeys.includes(key) && item[key]) {
-                const scheduledTime = item[key];
-                const scheduledTimeMinutes = timeToMinutes(scheduledTime);
-
-                // Buscar todos los registros de la API que cumplan las condiciones solicitadas
-                const candidateRecords = cachedApiData.filter(apiRecord => {
-                    if (!apiRecord) return false;
-
-                    // 1. Filtrar por Línea: comparar solo los 2 primeros caracteres
-                    if (item.Linia.substr(0, 2).toLowerCase() !== (apiRecord.lin || "").substr(0, 2).toLowerCase()) 
-                        return false;
-
-                    // 2. Filtrar por Dirección
-                    if (item["A/D"].toLowerCase() !== (apiRecord.dir || "").toLowerCase())
-                        return false;
-
-                    // 3. Filtrar por Estación: Comprobar que la clave coincide con la primera parada o con la segunda parada (si existe)
-                    if (apiRecord.properes_parades) {
-                        try {
-                            let parts = apiRecord.properes_parades.split(';').map(p => p.trim()).filter(p => p);
-                            let firstStation = "", secondStation = "";
-                            if (parts.length > 0) {
-                                let parsed = JSON.parse(parts[0]);
-                                firstStation = (parsed.parada || "").toLowerCase();
-                            }
-                            if (parts.length > 1) {
-                                let parsed = JSON.parse(parts[1]);
-                                secondStation = (parsed.parada || "").toLowerCase();
-                            }
-                            if (key.toLowerCase() === firstStation || (secondStation && key.toLowerCase() === secondStation)) {
-                                return true;
-                            }
-                            return false;
-                        } catch (error) {
-                            console.error("Error al procesar properes_parades:", error);
-                            return false;
-                        }
-                    }
-                    return false;
-                });
-
-                // 4. Filtrar por la hora: asociar solo si la diferencia es <= 8 minutos
-                if (
-                    candidateRecords.length > 0 &&
-                    scheduledTimeMinutes !== null &&
-                    (scheduledTimeMinutes - currentTimeMinutes) >= -1 &&
-                    (scheduledTimeMinutes - currentTimeMinutes) <= 5
-                ) {
-                     // Buscar todos los registros candidatos no asignados
-                     const availableRecords = candidateRecords.filter(record => 
-                     !Object.values(trainMapping).includes(record.id)
-                 );
-                    
-                    // Buscar el primer registro candidato que tenga una id no asignada aún
-                    if (!trainMapping[item.Tren] && availableRecords.length > 0) {
-                        // Tomar el registro con menor diferencia de tiempo
-                        const bestRecord = availableRecords.reduce((prev, current) => {
-                            const prevDiff = Math.abs(scheduledTimeMinutes - timeToMinutes(prev.hora));
-                            const currDiff = Math.abs(scheduledTimeMinutes - timeToMinutes(current.hora));
-                            return currDiff < prevDiff ? current : prev;
-                        });
-                        trainMapping[item.Tren] = bestRecord.id;
-                    }
-                }
-            }
-        });
-    });
-}
-
 // Función para registrar los event listeners del menú
 function initMenuListeners() {
     document.querySelectorAll('.menu a').forEach(link => {
@@ -208,9 +106,6 @@ function initMenuListeners() {
                               filename.includes('2_3') ? '200/300' : 
                               'feiners';
                 document.querySelector('h1').textContent = `Servei ${title}`;
-                // Al cargar un nuevo itinerario, reconstruimos el mapeo
-                buildTrainMapping();
-                updateTable();
             } catch (error) {
                 console.error('Error al canviar d\'itinerari:', error);
             }
@@ -232,7 +127,7 @@ function clearFilters() {
     elements.linia.value = '';
     elements.ad.value = '';
     elements.estacio.value = '';
-    elements.torn.value = '';
+    elements.torn.value = ''; // Limpiar filtro Torn
     elements.horaInici.value = '';
     elements.horaFi.value = '';
     elements.resultContainer.style.display = 'none';
@@ -275,7 +170,7 @@ function filterData() {
         linia: elements.linia.value.trim(),
         ad: elements.ad.value.trim(),
         estacio: elements.estacio.value.trim(),
-        torn: elements.torn.value.trim(),
+        torn: elements.torn.value.trim(), // Nuevo filtro
         horaInici: elements.horaInici.value.trim(),
         horaFi: elements.horaFi.value.trim()
     };
@@ -291,7 +186,64 @@ function filterData() {
     const horaIniciMin = timeToMinutes(filters.horaInici);
     const horaFiMin = timeToMinutes(filters.horaFi);
 
-    if (filters.torn) {
+    if (filters.linia && !filters.estacio) {
+        const seenTrains = new Set();
+        filteredData = data
+            .filter(item => item.Linia.toLowerCase().includes(filters.linia.toLowerCase()))
+            .flatMap(item => {
+                if (seenTrains.has(item.Tren)) return [];
+                
+                const stations = Object.keys(item)
+                    .filter(key => !['Tren', 'Linia', 'A/D', 'Serveis', 'Torn', 'Tren_S'].includes(key) && item[key])
+                    .sort((a, b) => {
+                        const tA = timeToMinutes(item[a]);
+                        const tB = timeToMinutes(item[b]);
+                        return tA - tB;
+                    });
+
+                for (const station of stations) {
+                    const timeMin = timeToMinutes(item[station]);
+                    let matchesTimeRange = true;
+
+                    if (horaIniciMin !== null) {
+                        if (horaFiMin === null) {
+                            if (timeMin < horaIniciMin && timeMin < 240) {
+                                matchesTimeRange = true;
+                            } else {
+                                matchesTimeRange = timeMin >= horaIniciMin;
+                            }
+                        } else {
+                            if (horaIniciMin > horaFiMin) {
+                                matchesTimeRange = timeMin >= horaIniciMin || timeMin <= horaFiMin;
+                            } else {
+                                matchesTimeRange = timeMin >= horaIniciMin && timeMin <= horaFiMin;
+                            }
+                        }
+                    }
+
+                    if (matchesTimeRange) {
+                        seenTrains.add(item.Tren);
+                        return [{
+                            tren: item.Tren,
+                            linia: item.Linia,
+                            ad: item['A/D'],
+                            torn: item.Torn,
+                            tren_s: item.Tren_S,
+                            estacio: station,
+                            hora: item[station]
+                        }];
+                    }
+                }
+                return [];
+            })
+            .filter(entry => (
+                (!filters.tren || entry.tren.toLowerCase().includes(filters.tren.toLowerCase())) &&
+                (!filters.ad || entry.ad === filters.ad) &&
+                (!filters.torn || entry.torn.toLowerCase().includes(filters.torn.toLowerCase()))
+            ));
+    } else if (filters.torn) {
+        // Si se filtra por Torn, se lista un SOLO registro por cada tren cuyo Torn coincida,
+        // tomando la estación con el horario más bajo
         filteredData = data
             .filter(item => item.Torn && item.Torn.toLowerCase().includes(filters.torn.toLowerCase()))
             .map(item => {
@@ -343,104 +295,54 @@ function filterData() {
                 );
             });
     } else {
-        // Si hay un filtro de línea activo y no hay filtro de estación
-        if (filters.linia && !filters.estacio) {
-            const seenTrains = new Set(); // Para controlar trenes únicos
-            const trainFirstStops = new Map(); // Para guardar la primera parada de cada tren
+    // Sin filtro Torn, se listan todas las estaciones (itinerario completo)
+    filteredData = data.flatMap(item =>
+        Object.keys(item)
+            .filter(key => !['Tren', 'Linia', 'A/D', 'Serveis', 'Torn', 'Tren_S'].includes(key) && item[key])
+            .map(station => ({
+                tren: item.Tren,
+                linia: item.Linia,
+                ad: item['A/D'],
+                torn: item.Torn,
+                tren_s: item.Tren_S,
+                estacio: station,
+                hora: item[station]
+            }))
+        .filter(entry => {
+            const entryTimeMin = timeToMinutes(entry.hora);
+            let matchesTimeRange = true;
 
-            // Primer paso: encontrar la primera parada de cada tren que cumpla los filtros de tiempo
-            data.filter(item => item.Linia.toLowerCase().includes(filters.linia.toLowerCase()))
-                .forEach(item => {
-                    const stations = Object.keys(item)
-                        .filter(key => !['Tren', 'Linia', 'A/D', 'Serveis', 'Torn', 'Tren_S'].includes(key) && item[key])
-                        .sort((a, b) => {
-                            const tA = timeToMinutes(item[a]);
-                            const tB = timeToMinutes(item[b]);
-                            return tA - tB;
-                        });
-
-                    for (const station of stations) {
-                        const timeMin = timeToMinutes(item[station]);
-                        let matchesTimeRange = true;
-
-                        if (horaIniciMin !== null) {
-                            if (horaFiMin === null) {
-                                matchesTimeRange = timeMin >= horaIniciMin || (timeMin < 240 && timeMin < horaIniciMin);
-                            } else {
-                                if (horaIniciMin > horaFiMin) {
-                                    matchesTimeRange = timeMin >= horaIniciMin || timeMin <= horaFiMin;
-                                } else {
-                                    matchesTimeRange = timeMin >= horaIniciMin && timeMin <= horaFiMin;
-                                }
-                            }
-                        }
-
-                        if (matchesTimeRange && !seenTrains.has(item.Tren)) {
-                            seenTrains.add(item.Tren);
-                            trainFirstStops.set(item.Tren, {
-                                tren: item.Tren,
-                                linia: item.Linia,
-                                ad: item['A/D'],
-                                torn: item.Torn,
-                                tren_s: item.Tren_S,
-                                estacio: station,
-                                hora: item[station]
-                            });
-                            break;
-                        }
+            if (horaIniciMin !== null) {
+                if (horaFiMin === null) {
+                    // Si solo se proporciona hora de inicio
+                    // Asumimos que horas menores a la hora de inicio son trenes de después de medianoche
+                    if (entryTimeMin < horaIniciMin && entryTimeMin < 240) { // 240 minutos = 4:00 AM
+                        // Probablemente es un tren de después de medianoche
+                        matchesTimeRange = true;
+                    } else {
+// Tren normal después de la hora de inicio
+                        matchesTimeRange = entryTimeMin >= horaIniciMin;
                     }
-                });
-
-            filteredData = Array.from(trainFirstStops.values())
-                .filter(entry => (
-                    (!filters.tren || entry.tren.toLowerCase().includes(filters.tren.toLowerCase())) &&
-                    (!filters.ad || entry.ad === filters.ad) &&
-                    (!filters.torn || entry.torn.toLowerCase().includes(filters.torn.toLowerCase()))
-                ));
-        } else {
-            filteredData = data.flatMap(item =>
-                Object.keys(item)
-                    .filter(key => !['Tren', 'Linia', 'A/D', 'Serveis', 'Torn', 'Tren_S'].includes(key) && item[key])
-                    .map(station => ({
-                        tren: item.Tren,
-                        linia: item.Linia,
-                        ad: item['A/D'],
-                        torn: item.Torn,
-                        tren_s: item.Tren_S,
-                        estacio: station,
-                        hora: item[station]
-                    }))
-                .filter(entry => {
-                    const entryTimeMin = timeToMinutes(entry.hora);
-                    let matchesTimeRange = true;
-
-                    if (horaIniciMin !== null) {
-                        if (horaFiMin === null) {
-                            if (entryTimeMin < horaIniciMin && entryTimeMin < 240) {
-                                matchesTimeRange = true;
-                            } else {
-                                matchesTimeRange = entryTimeMin >= horaIniciMin;
-                            }
-                        } else {
-                            if (horaIniciMin > horaFiMin) {
-                                matchesTimeRange = entryTimeMin >= horaIniciMin || entryTimeMin <= horaFiMin;
-                            } else {
-                                matchesTimeRange = entryTimeMin >= horaIniciMin && entryTimeMin <= horaFiMin;
-                            }
-                        }
+                } else {
+                    // Si el rango pasa por medianoche (ej: 23:00 a 01:00)
+                    if (horaIniciMin > horaFiMin) {
+                        matchesTimeRange = entryTimeMin >= horaIniciMin || entryTimeMin <= horaFiMin;
+                    } else {
+                        matchesTimeRange = entryTimeMin >= horaIniciMin && entryTimeMin <= horaFiMin;
                     }
-                    
-                    return (
-                        (!filters.tren || entry.tren.toLowerCase().includes(filters.tren.toLowerCase())) &&
-                        (!filters.linia || entry.linia.toLowerCase().includes(filters.linia.toLowerCase())) &&
-                        (!filters.ad || entry.ad === filters.ad) &&
-                        (!filters.estacio || entry.estacio.toLowerCase().includes(filters.estacio.toLowerCase())) &&
-                        (!filters.torn || entry.torn.toLowerCase().includes(filters.torn.toLowerCase())) &&
-                        matchesTimeRange
-                    );
-                })  
+                }
+            }
+            
+            return (
+                (!filters.tren || entry.tren.toLowerCase().includes(filters.tren.toLowerCase())) &&
+                (!filters.linia || entry.linia.toLowerCase().includes(filters.linia.toLowerCase())) &&
+                (!filters.ad || entry.ad === filters.ad) &&
+                (!filters.estacio || entry.estacio.toLowerCase().includes(filters.estacio.toLowerCase())) &&
+                (!filters.torn || entry.torn.toLowerCase().includes(filters.torn.toLowerCase())) && // Filtro para Torn
+                matchesTimeRange
             );
-        }
+        })  
+    );
     }
     filteredData = sortResultsByTime(filteredData);
     updateTable();
@@ -475,21 +377,11 @@ function updateTable() {
             <td class="extra-col">${entry.torn}</td>
             <td class="extra-col"><a href="#" class="train-s-link" data-train="${entry.tren_s}">${entry.tren_s}</a></td>
         `;
-
-        // Si el tren está en circulación, se marca la fila en verde
-        if (trainMapping[entry.tren]) {
-            row.querySelector('.train-link').classList.add("in-circulation");
-        }
-        
-        /*if (trainMapping[entry.tren]) {
-            row.classList.add("in-circulation");
-        }*/
-
         // Listener para el enlace del tren principal
         const trainLink = row.querySelector('.train-link');
         trainLink.addEventListener('click', (e) => {
             e.preventDefault();
-            clearFilters();
+            clearFilters(); // Limpiar filtros existentes
             elements.tren.value = entry.tren;
             filterData();
         });
@@ -497,7 +389,7 @@ function updateTable() {
         const trainSLink = row.querySelector('.train-s-link');
         trainSLink.addEventListener('click', (e) => {
             e.preventDefault();
-            clearFilters();
+            clearFilters(); // Limpiar filtros existentes
             elements.tren.value = entry.tren_s;
             filterData();
         });
@@ -533,7 +425,7 @@ function initInputListeners() {
     elements.linia.addEventListener('input', debounce(filterData, DEBOUNCE_DELAY));
     elements.ad.addEventListener('change', debounce(filterData, DEBOUNCE_DELAY));
     elements.estacio.addEventListener('input', debounce(filterData, DEBOUNCE_DELAY));
-    elements.torn.addEventListener('input', debounce(filterData, DEBOUNCE_DELAY));
+    elements.torn.addEventListener('input', debounce(filterData, DEBOUNCE_DELAY)); // Nuevo listener para Torn
     elements.horaInici.addEventListener('input', debounce(filterData, DEBOUNCE_DELAY));
     elements.horaFi.addEventListener('input', debounce(filterData, DEBOUNCE_DELAY));
     elements.clearFilters.addEventListener('click', clearFilters);
@@ -545,28 +437,16 @@ async function init() {
         elements.resultContainer.style.display = 'none';
         filteredData = [];
         await Promise.all([cargarEstaciones(), loadData()]);
-        // Cargamos la cache de la API sin sustituir los datos del JSON
-        cachedApiData = loadApiCache();
-        console.log("API Cache carregada:", cachedApiData);
-        // Construir el mapeo de trenes y actualizar la tabla
-        buildTrainMapping();
-        updateTable();
+        console.log('Inicialización completada - La tabla permanece oculta');
     } catch (error) {
-        console.error('Error durant la inicialització:', error);
-        showError('Error al inicialitzar l\'aplicació');
+        console.error('Error durante la inicialización:', error);
+        showError('Error al inicializar la aplicación');
     }
     initMenuListeners();
     initInputListeners();
     if (elements.currentYear) {
         elements.currentYear.textContent = new Date().getFullYear();
     }
-    
-    // Actualizar el mapeo y la tabla cada 60 segundos para sincronizar con la API
-    setInterval(() => {
-        cachedApiData = loadApiCache();
-        buildTrainMapping();
-        updateTable();
-    }, 60000);
 }
 
 document.addEventListener('DOMContentLoaded', init);

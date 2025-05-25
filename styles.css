@@ -78,10 +78,6 @@ input:focus, select:focus {
     animation: fadeIn 0.3s ease;
 }
 
-.circulando {
-    background-color: #e0ffe0;
-}
-
 .highlighted-time {
     color: #cc220f; /* Color rojo, puedes cambiarlo al que prefieras */
     font-weight: bold;
@@ -313,12 +309,6 @@ th.row-number {
 .result-container {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-}
-
-.in-circulation {
-  color: #28a745 !important;
-  font-weight: 700;
-  border-bottom: 2px solid #218838;
 }
 
 a.train-link {
