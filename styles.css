@@ -33,6 +33,14 @@ h2 {
     margin-bottom: 1rem;
 }
 
+.navbar-title {
+    font-weight: 400;
+}
+
+.centered-title {
+    text-align: center;
+}
+
 .search-container {
     display: flex;
     flex-direction: column;
@@ -308,7 +316,6 @@ th.row-number {
 /* Para asegurar scroll horizontal suave en móviles */
 .result-container {
     overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
 }
 
 a.train-link {
@@ -321,4 +328,9 @@ a.train-link {
 a.train-link:hover {
     border-bottom: 1px solid rgb(46, 46, 78);
     color: var(--secondary-color);
+}
+
+/* Add this at the end of your CSS file */
+.centered-text {
+    text-align: center;
 }
