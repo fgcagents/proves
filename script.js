@@ -5,7 +5,7 @@ const ITEMS_PER_PAGE = 33;
 const DEBOUNCE_DELAY = 300;
 let filterTimeout;
 let filteredData = [];
-let previousState = null; // Estado anterior para el botón "Tornar enrere"
+let previousState = null; // Estado anterior para el botón "Volver atrás"
 
 // Elementos del DOM
 const elements = {
@@ -71,7 +71,7 @@ function restorePreviousState() {
     updateBackButton();
 }
 
-// Función para crear/actualizar el botón "Tornar enrere"
+// Función para crear/actualizar el botón "Volver atrás"
 function updateBackButton() {
     let backButton = document.getElementById('backButton');
     
@@ -79,13 +79,62 @@ function updateBackButton() {
         // Crear botón si no existe y hay estado anterior
         backButton = document.createElement('button');
         backButton.id = 'backButton';
-        backButton.textContent = '← Enrere';
-        backButton.className = 'clear-filters back-button';
-        backButton.style.marginRight = '0.5rem';
+        backButton.innerHTML = `
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m15 18-6-6 6-6"/>
+            </svg>
+            <span>Volver</span>
+        `;
+        
+        // Estilos iOS-like
+        backButton.style.cssText = `
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0, 122, 255, 0.1);
+            border: 1px solid rgba(0, 122, 255, 0.3);
+            border-radius: 20px;
+            padding: 8px 16px;
+            color: #007AFF;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 2px 8px rgba(0, 122, 255, 0.15);
+            z-index: 10;
+        `;
+        
+        // Efectos hover y active
+        backButton.addEventListener('mouseenter', () => {
+            backButton.style.background = 'rgba(0, 122, 255, 0.15)';
+            backButton.style.transform = 'translateY(-1px)';
+            backButton.style.boxShadow = '0 4px 12px rgba(0, 122, 255, 0.2)';
+        });
+        
+        backButton.addEventListener('mouseleave', () => {
+            backButton.style.background = 'rgba(0, 122, 255, 0.1)';
+            backButton.style.transform = 'translateY(0)';
+            backButton.style.boxShadow = '0 2px 8px rgba(0, 122, 255, 0.15)';
+        });
+        
+        backButton.addEventListener('mousedown', () => {
+            backButton.style.transform = 'translateY(0) scale(0.95)';
+        });
+        
+        backButton.addEventListener('mouseup', () => {
+            backButton.style.transform = 'translateY(-1px) scale(1)';
+        });
+        
         backButton.addEventListener('click', restorePreviousState);
         
-        // Insertar antes del botón "Limpiar filtros"
-        elements.clearFilters.parentNode.insertBefore(backButton, elements.clearFilters);
+        // Insertar en el contenedor de resultados con posición relativa
+        elements.resultContainer.style.position = 'relative';
+        elements.resultContainer.appendChild(backButton);
     } else if (!previousState && backButton) {
         // Eliminar botón si no hay estado anterior
         backButton.remove();
