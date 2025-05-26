@@ -83,30 +83,30 @@ function updateBackButton() {
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="m15 18-6-6 6-6"/>
             </svg>
-            <span>Volver</span>
+            <span>Tornar</span>
         `;
         
         // Estilos iOS-like
         backButton.style.cssText = `
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(0, 122, 255, 0.1);
-            border: 1px solid rgba(0, 122, 255, 0.3);
-            border-radius: 20px;
-            padding: 8px 16px;
-            color: #007AFF;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            box-shadow: 0 2px 8px rgba(0, 122, 255, 0.15);
-            z-index: 10;
+                position: absolute;
+                top: 15px;
+                left: 15px;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                background: rgba(0, 122, 255, 0.1);
+                border: 1px solid #2c3e50;
+                border-radius: 20px;
+                padding: 8px 16px;
+                color: #2c3e50;
+                font-size: 14px;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                box-shadow: 0 2px 8px rgba(0, 122, 255, 0.15);
+                z-index: 10;        
         `;
         
         // Efectos hover y active
