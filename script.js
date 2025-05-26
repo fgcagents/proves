@@ -371,6 +371,7 @@ function updateTable() {
         button.textContent = 'Tornar enrere';
         button.className = 'clear-filters';
         button.style.marginRight = '10px';
+        button.style.marginBottom = '10px';
         button.addEventListener('click', () => {
             // Restaurar el estado anterior
             elements.tren.value = previousState.filters.tren;
@@ -385,7 +386,13 @@ function updateTable() {
             previousState = null;
             updateTable();
         });
-        elements.resultContainer.insertBefore(button, elements.resultats);
+        // Insertar el botón antes de la tabla pero después del título
+        const tableTitle = document.getElementById('table-title');
+        if (tableTitle) {
+            tableTitle.insertAdjacentElement('afterend', button);
+        } else {
+            elements.resultContainer.insertBefore(button, elements.resultats);
+        }
     } else if (!previousState && backButton) {
         backButton.remove();
     }
