@@ -435,7 +435,14 @@ function updateTable() {
                 filteredData: [...filteredData],
                 currentPage: currentPage
             };
-            // Establecer el nuevo valor del tren sin limpiar otros filtros
+            // Guardar los valores de tiempo
+            const horaIniciTemp = elements.horaInici.value;
+            const horaFiTemp = elements.horaFi.value;
+            // Limpiar todos los filtros
+            clearFilters();
+            // Restaurar los valores de tiempo y establecer el tren
+            elements.horaInici.value = horaIniciTemp;
+            elements.horaFi.value = horaFiTemp;
             elements.tren.value = entry.tren;
             filterData();
         });
@@ -458,7 +465,14 @@ function updateTable() {
                 filteredData: [...filteredData],
                 currentPage: currentPage
             };
-            // Establecer el nuevo valor del tren sin limpiar otros filtros
+            // Guardar los valores de tiempo
+            const horaIniciTemp = elements.horaInici.value;
+            const horaFiTemp = elements.horaFi.value;
+            // Limpiar todos los filtros
+            clearFilters();
+            // Restaurar los valores de tiempo y establecer el tren
+            elements.horaInici.value = horaIniciTemp;
+            elements.horaFi.value = horaFiTemp;
             elements.tren.value = entry.tren_s;
             filterData();
         });
