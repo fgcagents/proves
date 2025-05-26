@@ -123,7 +123,7 @@ function debounce(func, delay) {
 }
 
 // Función para limpiar filtros y actualizar la tabla
-function clearFilters() {
+function clearFilters(keepPreviousState = false) {
     elements.tren.value = '';
     elements.linia.value = '';
     elements.ad.value = '';
@@ -133,10 +133,12 @@ function clearFilters() {
     elements.horaFi.value = '';
     elements.resultContainer.style.display = 'none';
     filteredData = [];
-    previousState = null; // Resetear el estado anterior
-    const backButton = document.getElementById('backButton');
-    if (backButton) {
-        backButton.remove();
+    if (!keepPreviousState) {
+        previousState = null;
+        const backButton = document.getElementById('backButton');
+        if (backButton) {
+            backButton.remove();
+        }
     }
     updateTable();
 }
@@ -438,8 +440,8 @@ function updateTable() {
             // Guardar los valores de tiempo
             const horaIniciTemp = elements.horaInici.value;
             const horaFiTemp = elements.horaFi.value;
-            // Limpiar todos los filtros
-            clearFilters();
+            // Limpiar todos los filtros manteniendo el estado anterior
+            clearFilters(true);
             // Restaurar los valores de tiempo y establecer el tren
             elements.horaInici.value = horaIniciTemp;
             elements.horaFi.value = horaFiTemp;
@@ -468,8 +470,8 @@ function updateTable() {
             // Guardar los valores de tiempo
             const horaIniciTemp = elements.horaInici.value;
             const horaFiTemp = elements.horaFi.value;
-            // Limpiar todos los filtros
-            clearFilters();
+            // Limpiar todos los filtros manteniendo el estado anterior
+            clearFilters(true);
             // Restaurar los valores de tiempo y establecer el tren
             elements.horaInici.value = horaIniciTemp;
             elements.horaFi.value = horaFiTemp;
