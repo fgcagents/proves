@@ -421,7 +421,7 @@ function updateTable() {
         const trainLink = row.querySelector('.train-link');
         trainLink.addEventListener('click', (e) => {
             e.preventDefault();
-            // Guardar el estado actual antes de limpiar los filtros
+            // Guardar el estado actual
             previousState = {
                 filters: {
                     tren: elements.tren.value,
@@ -435,7 +435,7 @@ function updateTable() {
                 filteredData: [...filteredData],
                 currentPage: currentPage
             };
-            clearFilters(); // Limpiar filtros existentes
+            // Establecer el nuevo valor del tren sin limpiar otros filtros
             elements.tren.value = entry.tren;
             filterData();
         });
@@ -444,7 +444,7 @@ function updateTable() {
         const trainSLink = row.querySelector('.train-s-link');
         trainSLink.addEventListener('click', (e) => {
             e.preventDefault();
-            // Guardar el estado actual antes de limpiar los filtros
+            // Guardar el estado actual
             previousState = {
                 filters: {
                     tren: elements.tren.value,
@@ -458,7 +458,7 @@ function updateTable() {
                 filteredData: [...filteredData],
                 currentPage: currentPage
             };
-            clearFilters(); // Limpiar filtros existentes
+            // Establecer el nuevo valor del tren sin limpiar otros filtros
             elements.tren.value = entry.tren_s;
             filterData();
         });
