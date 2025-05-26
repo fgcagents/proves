@@ -97,19 +97,19 @@ function updateBackButton() {
                 background: rgba(0, 122, 255, 0.1);
                 border: 1px solid #2c3e50;
                 border-radius: 20px;
-                padding: 8px 16px;
+                padding: 4px 8px;
                 color: #2c3e50;
                 font-size: 14px;
                 font-weight: 500;
                 cursor: pointer;
-                transition: all 0.2s ease;
+                transition: ;
                 backdrop-filter: blur(10px);
                 -webkit-backdrop-filter: blur(10px);
-                box-shadow: 0 2px 8px rgba(0, 122, 255, 0.15);
+                box-shadow:;
                 z-index: 10;        
         `;
         
-        // Efectos hover y active
+       /* // Efectos hover y active
         backButton.addEventListener('mouseenter', () => {
             backButton.style.background = 'rgba(0, 122, 255, 0.15)';
             backButton.style.transform = 'translateY(-1px)';
@@ -128,7 +128,7 @@ function updateBackButton() {
         
         backButton.addEventListener('mouseup', () => {
             backButton.style.transform = 'translateY(-1px) scale(1)';
-        });
+        });*/
         
         backButton.addEventListener('click', restorePreviousState);
         
