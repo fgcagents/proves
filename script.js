@@ -5,6 +5,7 @@ const ITEMS_PER_PAGE = 33;
 const DEBOUNCE_DELAY = 300;
 let filterTimeout;
 let filteredData = [];
+let previousState = null; // Para guardar el estado anterior
 
 // Elementos del DOM
 const elements = {
@@ -127,11 +128,16 @@ function clearFilters() {
     elements.linia.value = '';
     elements.ad.value = '';
     elements.estacio.value = '';
-    elements.torn.value = ''; // Limpiar filtro Torn
+    elements.torn.value = '';
     elements.horaInici.value = '';
     elements.horaFi.value = '';
     elements.resultContainer.style.display = 'none';
     filteredData = [];
+    previousState = null; // Resetear el estado anterior
+    const backButton = document.getElementById('backButton');
+    if (backButton) {
+        backButton.remove();
+    }
     updateTable();
 }
 
@@ -357,6 +363,33 @@ function updateTable() {
         return;
     }
 
+    // Añadir botón de volver atrás si hay un estado anterior
+    const backButton = document.getElementById('backButton');
+    if (previousState && !backButton) {
+        const button = document.createElement('button');
+        button.id = 'backButton';
+        button.textContent = 'Tornar enrere';
+        button.className = 'clear-filters';
+        button.style.marginRight = '10px';
+        button.addEventListener('click', () => {
+            // Restaurar el estado anterior
+            elements.tren.value = previousState.filters.tren;
+            elements.linia.value = previousState.filters.linia;
+            elements.ad.value = previousState.filters.ad;
+            elements.estacio.value = previousState.filters.estacio;
+            elements.torn.value = previousState.filters.torn;
+            elements.horaInici.value = previousState.filters.horaInici;
+            elements.horaFi.value = previousState.filters.horaFi;
+            filteredData = previousState.filteredData;
+            currentPage = previousState.currentPage;
+            previousState = null;
+            updateTable();
+        });
+        elements.resultContainer.insertBefore(button, elements.resultats);
+    } else if (!previousState && backButton) {
+        backButton.remove();
+    }
+
     const fragment = document.createDocumentFragment();
     const startIndex = currentPage * ITEMS_PER_PAGE;
     const endIndex = startIndex + ITEMS_PER_PAGE;
@@ -376,18 +409,48 @@ function updateTable() {
             <td class="extra-col">${entry.torn}</td>
             <td class="extra-col"><a href="#" class="train-s-link" data-train="${entry.tren_s}">${entry.tren_s}</a></td>
         `;
+        
         // Listener para el enlace del tren principal
         const trainLink = row.querySelector('.train-link');
         trainLink.addEventListener('click', (e) => {
             e.preventDefault();
+            // Guardar el estado actual antes de limpiar los filtros
+            previousState = {
+                filters: {
+                    tren: elements.tren.value,
+                    linia: elements.linia.value,
+                    ad: elements.ad.value,
+                    estacio: elements.estacio.value,
+                    torn: elements.torn.value,
+                    horaInici: elements.horaInici.value,
+                    horaFi: elements.horaFi.value
+                },
+                filteredData: [...filteredData],
+                currentPage: currentPage
+            };
             clearFilters(); // Limpiar filtros existentes
             elements.tren.value = entry.tren;
             filterData();
         });
+
         // Listener para el enlace del tren_s
         const trainSLink = row.querySelector('.train-s-link');
         trainSLink.addEventListener('click', (e) => {
             e.preventDefault();
+            // Guardar el estado actual antes de limpiar los filtros
+            previousState = {
+                filters: {
+                    tren: elements.tren.value,
+                    linia: elements.linia.value,
+                    ad: elements.ad.value,
+                    estacio: elements.estacio.value,
+                    torn: elements.torn.value,
+                    horaInici: elements.horaInici.value,
+                    horaFi: elements.horaFi.value
+                },
+                filteredData: [...filteredData],
+                currentPage: currentPage
+            };
             clearFilters(); // Limpiar filtros existentes
             elements.tren.value = entry.tren_s;
             filterData();
