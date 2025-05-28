@@ -266,6 +266,12 @@ const sortResultsByTime = results => {
 };
 
 // Función para determinar si se debe resaltar la hora
+const greenTrains = ["M301", "M302"];
+
+function shouldHighlightGreenTime(entry) {
+    return greenTrains.includes(entry.tren);
+}
+
 function shouldHighlightTime(entry) {
     const estaciones = {
         R5: ["MV", "CL", "CG"],
@@ -274,7 +280,7 @@ function shouldHighlightTime(entry) {
         R60: ["MG", "ML", "CG", "CR", "QC", "PA", "PL", "MV", "ME", "BE", "CP"]
     };
 
-    const specificTrains = ["N334", "P336", "P362", "N364", "P364", "N366", "P366","M301"];
+    const specificTrains = ["N334", "P336", "P362", "N364", "P364", "N366", "P366"];
     const isLineaValid = Object.keys(estaciones).includes(entry.linia) && estaciones[entry.linia].includes(entry.estacio);
     const isSpecificTrain = specificTrains.includes(entry.tren);
     return isLineaValid && !(isSpecificTrain && entry.ad === "D");
@@ -482,7 +488,14 @@ function updateTable() {
     itemsToShow.forEach((entry, index) => {
         const row = document.createElement('tr');
         const rowNumber = startIndex + index + 1;
-        const horaClass = shouldHighlightTime(entry) ? 'highlighted-time' : '';
+        
+        let horaClass = '';
+        if (shouldHighlightGreenTime(entry)) {
+            horaClass = 'highlighted-green';
+        } else if (shouldHighlightTime(entry)) {
+            horaClass = 'highlighted-time';
+        }
+        
         row.innerHTML = `
             <td class="row-number">${rowNumber}</td>
             <td>${entry.ad}</td>
@@ -493,6 +506,7 @@ function updateTable() {
             <td class="extra-col">${entry.torn}</td>
             <td class="extra-col"><a href="#" class="train-s-link" data-train="${entry.tren_s}">${entry.tren_s}</a></td>
         `;
+    });
         
         // Listener para el enlace del tren principal
         const trainLink = row.querySelector('.train-link');
