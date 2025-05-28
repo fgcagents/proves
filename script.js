@@ -506,7 +506,6 @@ function updateTable() {
             <td class="extra-col">${entry.torn}</td>
             <td class="extra-col"><a href="#" class="train-s-link" data-train="${entry.tren_s}">${entry.tren_s}</a></td>
         `;
-    });
         
         // Listener para el enlace del tren principal
         const trainLink = row.querySelector('.train-link');
