@@ -92,6 +92,10 @@ input:focus, select:focus {
     font-size: 0.6rem;
 }
 
+.highlighted-green {
+    background-color: #c8f7c5; /* Verd clar */
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
