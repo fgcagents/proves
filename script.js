@@ -274,7 +274,7 @@ function shouldHighlightTime(entry) {
         R60: ["MG", "ML", "CG", "CR", "QC", "PA", "PL", "MV", "ME", "BE", "CP"]
     };
 
-    const specificTrains = ["N334", "P336", "P362", "N364", "P364", "N366", "P366"];
+    const specificTrains = ["N334", "P336", "P362", "N364", "P364", "N366", "P366","M301"];
     const isLineaValid = Object.keys(estaciones).includes(entry.linia) && estaciones[entry.linia].includes(entry.estacio);
     const isSpecificTrain = specificTrains.includes(entry.tren);
     return isLineaValid && !(isSpecificTrain && entry.ad === "D");
