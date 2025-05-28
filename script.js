@@ -266,7 +266,9 @@ const sortResultsByTime = results => {
 };
 
 // Función para determinar si se debe resaltar la hora
-const greenTrains = ["M301", "M302"];
+const greenTrains = ["M301", "L103","L105", "M303", "L109", "L111", "L106", "M302", "L110", "L112", "M304", "L116", "L814",
+                     "L163", "L165", "L167", "L169", "L171", "L173", "L856", "L164", "L166", "L168", "L170", "L172", "L174",
+                     "L176", "L858"];
 
 function shouldHighlightGreenTime(entry) {
     return greenTrains.includes(entry.tren);
