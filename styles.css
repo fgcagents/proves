@@ -96,6 +96,19 @@ input:focus, select:focus {
     background-color: #c8f7c5; /* Verd clar */
 }
 
+.linia-m-row {
+    color: #888888 !important;
+}
+
+.linia-m-row td {
+    color: #888888 !important;
+}
+
+/* Si también quieres que los enlaces mantengan el color gris */
+.linia-m-row a {
+    color: #888888 !important;
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
