@@ -498,6 +498,16 @@ function updateTable() {
             horaClass = 'highlighted-time';
         }
         
+        // Agregar clase CSS para filas con línea M
+        let rowClass = '';
+        if (entry.linia === 'M') {
+            rowClass = 'linia-m-row';
+        }
+        
+        if (rowClass) {
+            row.className = rowClass;
+        }
+        
         row.innerHTML = `
             <td class="row-number">${rowNumber}</td>
             <td>${entry.ad}</td>
