@@ -171,9 +171,9 @@ function updateTableTitle() {
     const title = document.getElementById('table-title');
     const value = select.value;
     if (value === 'A') {
-        title.textContent = 'Trens Ascendents';
+        title.textContent = 'Ascendents';
     } else if (value === 'D') {
-        title.textContent = 'Trens Descendents';
+        title.textContent = 'Descendents';
     } else {
         title.textContent = 'Ascendents/Descendents';
     }
